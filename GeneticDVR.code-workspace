@@ -1,0 +1,24 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../../../folderFromHost"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"*.tcc": "cpp",
+			"memory_resource": "cpp",
+			"fstream": "cpp",
+			"ostream": "cpp",
+			"shared_mutex": "cpp",
+			"sstream": "cpp",
+			"streambuf": "cpp",
+			"exception": "cpp",
+			"iosfwd": "cpp",
+			"new": "cpp"
+		}
+	}
+}

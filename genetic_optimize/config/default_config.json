@@ -1,0 +1,32 @@
+{
+    "algorithm": {
+        "population_size": 50,
+        "generations": 10,
+        "save_interval": 5,
+        "text_interval": 10,
+        "device": "cuda",
+        "bg_color": [0, 0, 0],
+        "model_name": "gemini-2.0-flash-001",
+        "save_path": "results"
+    },
+    "mutation": {
+        "cam_mutation_rate": [0.05, 0.4],
+        "cam_mutation_scale": [0.05, 0.2],
+        "op_mutation_rate": [0.1, 0.4],
+        "op_mutation_scale": [0.05, 0.4],
+        "x_mutation_scale": [0.01, 0.04],
+        "bandwidth_mutation_scale": [0.05, 0.2],
+        "color_mutation_rate": [0.2, 0.4],
+        "H_mutation_scale": [0.1, 0.15],
+        "SL_mutation_scale": [0.05, 0.2]
+    },
+    "api": {
+        "base_url": "",
+        "api_key": "",
+        "prompt_folder": "",
+        "instruct_path": null,
+        "instruct_number": null,
+        "quality_metrics": "16,11,14",
+        "text_metrics": "5"
+    }
+} 

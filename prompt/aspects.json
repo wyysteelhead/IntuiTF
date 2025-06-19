@@ -1,0 +1,100 @@
+{
+    "ASPECTS": [
+        {
+            "index": 1,
+            "name": "Overall Clarity and Visibility",
+            "description": "Focus on the clearity and visibility of the entire image. First describe the content and primary focus of each rendering, then assess your confidence in the accuracy of your description and determine which rendering offers a clearer representation."
+        },
+        {
+            "index": 2,
+            "name": "Visualization of Key Structures and Pathology",
+            "description": "Identify key anatomical structures and pathological findings based on the overall clarity assessment. Evaluate how well the renderings highlight these features, including the use of color to distinguish different tissues. Consider whether color contrast effectively enhances visibility and diagnostic clarity."
+        },
+        {
+            "index": 3,
+            "name": "Image Quality",
+            "description": "Analyze the quality of the images, considering aspects such as the presence of artifacts, contrast, lightness, and resolution. Ensure the rendering is free of significant noise or distortions that could impair diagnostic accuracy."
+        },
+        {
+            "index": 4,
+            "name": "Depth Perception and Spatial Representation",
+            "description": "Depth Perception and Spatial Representation: Assess the ability of each rendering to convey spatial relationships between structures in a meaningful way."
+        },
+        {
+            "index": 5,
+            "name": "Text Alignment and Visual Quality",
+            "description": "Evaluate both how well the images align with the given text description and their overall visual quality. For alignment, assess whether all key objects, colors, and stylistic elements mentioned in the text are accurately represented. For visual quality, examine whether the rendering is aesthetically pleasing and technically sound - free from noise, jagged edges, artifacts, or other rendering errors that detract from the experience. Consider whether the image achieves both semantic accuracy and visual refinement simultaneously. An ideal image should not only faithfully capture the described content and style, but also present it in a visually polished manner with smooth gradients, clean edges, and appropriate detail resolution. First describe each image's content and visual characteristics, then determine which one better balances text prompt fidelity with rendering excellence. This aspect MUST be prioritized when multiple aspects are considered."
+        },
+        {
+            "index": 6,
+            "name": "Feature Discrimination",
+            "description": "Focus on the richness and clarity of the image's content. First, describe the number of key features or elements visible in the image. Then, assess how well these features are visually distinguished and emphasized, whether through contrast, color, texture, or other techniques. Determine which rendering offers a more complete and variable representation of the features."
+        },
+        {
+            "index": 7,
+            "name": "Information Richness",
+            "description": "Focus on the how many information can be gained through viewing the image. First describe the content of each rendering, then assess your confidence in the accuracy of your description and determine which rendering offers a clearer representation."
+        },
+        {
+            "index": 8,
+            "name": "Aesthetic Quality",
+            "description": "Evaluate the overall visual appeal of the images, considering composition, color harmony, lighting, and artistic expression. First, describe the aesthetic characteristics of each rendering, noting elements such as balance, contrast, and visual flow. Then, compare the two renderings to determine which one presents a more refined and visually pleasing composition."
+        },
+        {
+            "index": 9,
+            "name": "Aesthetic Quality",
+            "description": "Evaluate the overall visual appeal of the images, considering composition, color harmony, lighting, and artistic expression. Pay special attention to clarity and visibility—an ideal image should maintain a balance between artistic style and clear presentation of details, avoiding excessive obstructions or visual clutter. First, describe the aesthetic characteristics of each rendering, noting elements such as balance, contrast, and visual flow. Then, compare the two renderings to determine which one presents a more refined, visually pleasing, and comprehensible composition."
+        },
+        {
+            "index": 10,
+            "name": "Information Efficiency",
+            "description": "Evaluate how effectively each rendering balances maximizing relevant information while eliminating noise. First, identify the distinct and meaningful features visible in each image. Then assess whether irrelevant details, artifacts, or visual noise have been successfully filtered out. A superior rendering should not simply contain more information, but rather more useful information - preserving diagnostic or contextually important elements while suppressing distracting or redundant content. Consider how color, opacity, and contrast choices contribute to highlighting essential structures while de-emphasizing unimportant regions. Finally, determine which image achieves the better signal-to-noise ratio, conveying the most comprehensive yet clean representation of the relevant data without unnecessary visual clutter."
+        },
+        {
+            "index": 11,
+            "name": "Feature Discrimination",
+            "description": "Focus on the ability to distinguish and identify different elements within the image. First, identify and enumerate the distinct features or structures visible in each rendering. Then, evaluate how effectively these features are visually separated and emphasized through techniques such as contrast, color differentiation, edge definition, or texture variation. Consider whether important structures are clearly delineated from surrounding elements, and assess which rendering allows for better discrimination between adjacent or similar features. Finally, determine which rendering provides a more comprehensive and well-differentiated representation of the relevant features."
+        },
+        {
+            "index": 12,
+            "name": "Original Structure Preservation",
+            "description": "Compare the two modified images (middle and right) with the original image (left) to determine which one better preserves all unmodified aspects from the original. Specifically, evaluate which modification maintains better fidelity to the original in terms of color, opacity, shape, and texture for all features that were not explicitly targeted by the modification instruction. The ideal modification should only change what was requested in the edit instruction while keeping everything else (color schemes, transparency levels, structural details, etc.) identical to the original. Identify any unwanted changes or inconsistencies with the original image and determine which modification better respects the integrity of those elements that should remain unchanged."
+        },
+        {
+            "index": 13,
+            "name": "Modification Instruction Alignment",
+            "description": "Evaluate which of the two modified images (middle and right) better aligns with the specific modification instruction provided. Focus on the red highlighted area and assess how effectively each modification implements the requested changes. Consider whether the modifications accurately reflect what was asked for in the edit instruction, including any specific details about appearance, intensity, structure, or other characteristics mentioned in the instruction. Determine which modification more faithfully and effectively executes the requested edit."
+        },
+        {
+            "index": 14,
+            "name": "Color-Content Harmony",
+            "description": "Evaluate how harmoniously the color scheme of each image aligns with the natural attributes of the content being displayed. Begin by analyzing what is depicted in both images, identifying the main structures and elements. Then, consider the natural or typical colors associated with these elements in their real-world context (such as anatomical tissues, natural objects, etc.). Next, assess how each image's color palette represents these elements, examining hue choices, contrast levels, and saturation. Consider whether these color choices align with realistic expectations, enhance comprehensibility, and complement the functional and characteristic properties of the depicted objects. Finally, compare both images to determine which one better balances authenticity with visualization clarity, creating a more harmonious and effective representation of the content."
+        },
+        {
+            "index": 15,
+            "name": "Information Efficiency",
+            "description": "Evaluate how effectively each rendering balances preserving ALL relevant information while only eliminating true noise. First, identify all distinct and meaningful features visible in each image, including subtle details that relate to the core data. Then assess whether only irrelevant elements (random noise artifacts, technical errors, or completely unrelated visual clutter) have been filtered out. A superior rendering must retain ALL data-relevant information - even minor details that could be diagnostically significant - while only suppressing truly distracting elements that have no informational value. Important: Do not confuse detail richness with noise - fine structures, subtle variations, and small features are often critical information that must be preserved. Consider how color, opacity, and contrast choices enhance the visibility of all relevant data while only minimizing genuine distractions. Finally, determine which image achieves the better signal-to-noise ratio by preserving the complete range of meaningful data while only removing elements that contribute no value to understanding the content."
+        },
+        {
+            "index": 16,
+            "name": "Information Richness",
+            "description": "Evaluate how effectively each rendering preserves ALL types of meaningful information, including structural details, color variations, and transparency effects. First, identify all distinct features visible in each image, recognizing that information can be encoded through multiple channels (shape, color, opacity, etc.). Important: Color and transparency variations are NOT noise - they are legitimate data channels that often represent critical information about different tissue types or functional areas. A superior rendering must display the full spectrum of relevant visual information - structures in multiple colors and varying opacity levels should be considered valuable data that enhances understanding, not distractions to be eliminated. Assess which rendering provides more complete information through all available visual channels (structural detail, color differentiation, opacity gradients) while only removing truly random artifacts that have no pattern or meaning. The ideal rendering should present a rich, multi-layered visualization that captures the complexity of the underlying data through appropriate use of all visual dimensions."
+        },
+        {
+            "index": 17,
+            "name": "Color Style Matching",
+            "description": "Determine which volume-rendered image (middle or right) has colors that better match the reference style image (left). Compare the color palette, brightness levels, contrast, and overall color mood. For example, if the reference style uses vibrant reds and oranges, check which rendering better incorporates similar colors. Or if the reference has a high-contrast dark-and-light pattern, evaluate which rendering better adopts this contrast style."
+        },
+        {
+            "index": 18,
+            "name": "Structural Style Matching",
+            "description": "Determine which volume-rendered image (middle or right) better represents structures in a similar style to the reference image (left). Look for common visual elements like how edges are highlighted, how shapes are emphasized, and how details are presented. For example, if the reference style shows smooth flowing contours, check which rendering better captures this flowing quality. Or if the reference style emphasizes certain features through highlight/shadow techniques, see which rendering adopts similar techniques to highlight comparable structures in the volume data."
+        }
+    ],
+    "MODES": {
+        "text": "5",
+        "quality": "10,11,14",
+        "finetune": "13",
+        "image": "17,18"
+    }
+}

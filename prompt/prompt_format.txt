@@ -1,0 +1,40 @@
+Our task here is the compare two volume-rendered images, each rendered using a different transfer function applied to the same {VOLUME_NAME}.
+We want to decide which one is better according to the provided criteria.
+
+# Instruction
+You will see an image containing two renderings of this {VOLUME_NAME}.
+Both images are enclosed in red boxes to ensure visibility. Please focus on the content inside these red boxes.
+The left part of the image contains a volume-rendered image created using transfer function 1, and the right part contains a volume-rendered image created using transfer function 2.
+We would like to compare these two volume-rendered images from the following aspects:
+
+{ASPECTS}
+
+Take a really close look at the two volume-rendered images before providing your answer.
+
+When evaluating these aspects, focus on one of them at a time.
+
+Try to make independent decision between these criteria.
+
+# Output format
+To provide an answer, please provide a short analysis for each of the abovementioned evaluation criteria.
+The analysis should be very concise and accurate.
+
+For each of the criteria, you need to make a decision using these three options:
+1. Left (object 1) is better;
+2. Right (object 2) is better;
+3. Cannot decide.
+IMPORTANT: PLEASE USE THE THIRD OPTION SPARSELY. If you cannot extract any meaningful information from both images (e.g., too blurry, too dark, or no visible structure), you should choose option 3 for that criterion. Otherwise, you must try your best to make a decision, even if the images are low quality.
+
+And then, in the last row, summarize your final decision by "<option for critera 1> <option for criteria 2> <option for critera 3>".
+
+An example output looks like follows:
+"
+Analysis:
+
+{ANSWER_EXAMPLE}
+
+Final answer:
+{FINAL_ANSWER_EXAMPLE}
+"
+
+If you are unable to see the image, answer "NOT FOUND" instead of fake answer.

@@ -1,0 +1,292 @@
+{
+    "instructions": [
+        {
+            "name": "head1",
+            "content": "A semi-opaque volume rendering of the brain to visualize tumors in relation to surrounding tissues from various angles."
+        },
+        {
+            "name": "head2",
+            "content": "A high-contrast volume rendering of the paranasal sinuses to clearly visualize the extent of sinusitis."
+        },
+        {
+            "name": "head3",
+            "content": "A fully opaque volume rendering of cerebral vasculature to assess stenosis and aneurysms with clear differentiation between arterial and venous structures."
+        },
+        {
+            "name": "head4",
+            "content": "A high-contrast volume rendering focusing on the skull with fully opaque bones and transparent soft tissues to highlight potential fracture lines from multiple angles."
+        },
+        {
+            "name": "head5",
+            "content": "A fully opaque volume rendering of dental structures to assess for caries or abnormalities, with clear differentiation of affected areas."
+        },
+        {
+            "name": "head6",
+            "content": "A CT scan of head with highlight on skull."
+        },
+        {
+            "name": "head7",
+            "content": "A human head with semi-opaque outline, green skull and red teeth."
+        },
+        {
+            "name": "head8",
+            "content": "Photorealistic head anatomy."
+        },
+        {
+            "name": "head9",
+            "content": "A clear image of an Opaque face with skin eyes nose and lips."
+        },
+        {
+            "name": "head10",
+            "content": "A human head with yellow skull, blue teeth and semi-opaque face."
+        },
+        {
+            "name": "head11",
+            "content": "\"Attack on Titan\" style."
+        },
+        {
+            "name": "head12",
+            "content": "I need a medical education-style rendering that precisely separates and highlights informations about the human head anatomy."
+        },
+        {
+            "name": "head13",
+            "content": "Realistic head anatomy with full-opque silver skull, white teeth, and semi-opaque skin."
+        },
+        {
+            "name": "head14",
+            "content": "Realistic head anatomy with full-opque metal skull, red teeth, and semi-opaque skin."
+        },
+        {
+            "name": "head15",
+            "content": "Realistic head anatomy with full-opqaue brain tissues, red blood vessels, opaque white bone and green face outline."
+        },
+        {
+            "name": "chest1",
+            "content": "A high-contrast volume rendering of the liver to clearly visualize lesions in relation to surrounding tissues from various angles."
+        },
+        {
+            "name": "chest2",
+            "content": "A semi-opaque volume rendering of the lungs to assess for pulmonary nodules and masses with clear differentiation from surrounding structures."
+        },
+        {
+            "name": "chest3",
+            "content": "A fully opaque volume rendering of the heart and major vessels to assess for coronary artery disease and structural abnormalities with clear visualization of blood flow."
+        },
+        {
+            "name": "chest4",
+            "content": "A high-contrast volume rendering focusing on the thoracic spine with fully opaque bones and transparent soft tissues to assess for fractures or degenerative changes."
+        },
+        {
+            "name": "chest5",
+            "content": "A fully opaque volume rendering of the chest wall to assess for rib fractures or soft tissue injuries with clear visualization of underlying structures."
+        },
+        {
+            "name": "chest6",
+            "content": "Chest with semi-opaque outline and realistic bones."
+        },
+        {
+            "name": "chest7",
+            "content": "I need a medical education-style rendering that precisely separates and highlights informations about the chest anatomy."
+        },
+        {
+            "name": "chest8",
+            "content": "Photorealistic chest anatomy with full-opaque bone, red lungs, and semi-opaque skin."
+        },
+        {
+            "name": "abdomen1",
+            "content": "A semi-opaque volume rendering of the liver to clearly visualize lesions in relation to surrounding tissues from the front angle."
+        },
+        {
+            "name": "abdomen2",
+            "content": "A high-contrast volume rendering focusing on the appendix to assess for appendicitis, with clear visualization of inflammatory changes."
+        },
+        {
+            "name": "abdomen3",
+            "content": "A high-contrast volume rendering of the intestines to assess for bowel obstruction, emphasizing fluid levels and distended segments."
+        },
+        {
+            "name": "abdomen4",
+            "content": "A high-contrast volume rendering of the kidneys to visualize stones clearly, with emphasis on the renal pelvis and ureters."
+        },
+        {
+            "name": "abdomen5",
+            "content": "High-contrast visualization to highlight inflammatory changes and fluid accumulation"
+        },
+        {
+            "name": "abdomen6",
+            "content": "A CT scan of abdomen with highlight on bone"
+        },
+        {
+            "name": "abdomen7",
+            "content": "A CT scan of abdomen with highlight on organs"
+        },
+        {
+            "name": "abdomen8",
+            "content": "An abdomen in disney style."
+        },
+        {
+            "name": "abdomen9",
+            "content": "A vibrant, high-contrast abdomen with rich, diverse colors."
+        },
+        {
+            "name": "abdomen10",
+            "content": "A vibrant, high-contrast abdomen with distinct colors highlighting different areas."
+        },
+        {
+            "name": "ncat1",
+            "content": "Colorful body"
+        },
+        {
+            "name": "feet1",
+            "content": "A CT scan of feet with highlight on bones"
+        },
+        {
+            "name": "feet2",
+            "content": "A CT scan of feet with highlight on tissues"
+        },
+        {
+            "name": "feet3",
+            "content": "A CT scan of feet focused on outline"
+        },
+        {
+            "name": "feet4",
+            "content": "A CT scan of feet with white bone and blue outline"
+        },
+        {
+            "name": "feet5",
+            "content": "Photorealistic foot anatomy."
+        },
+        {
+            "name": "feet6",
+            "content": "Photorealistic foot anatomy with full-opaque bone, red blood vessels, and semi-opaque skin."
+        },
+        {
+            "name": "feet7",
+            "content": "Cyberpunk style feet."
+        },
+        {
+            "name": "engine1",
+            "content": "An metalic engine."
+        },
+        {
+            "name": "engine2",
+            "content": "Full opaque metalic engine with explicit surface."
+        },
+        {
+            "name": "engine3",
+            "content": "Engine with explicit surface line and full opaque silver shaft."
+        },
+        {
+            "name": "engine4",
+            "content": "Cyberpunk style engine."
+        },
+        {
+            "name": "engine5",
+            "content": "A cyberpunk style engine with neon lights, glowing parts that pulse with energy."
+        },
+        {
+            "name": "tooth1",
+            "content": "A CT scan of a tooth with highlight on root"
+        },
+        {
+            "name": "tooth2",
+            "content": "A CT scan of a tooth with red root, blue enamel and yellow dentin"
+        },
+        {
+            "name": "tooth3",
+            "content": "Tooth with blue crown, red root, and yellow outline."
+        },
+        {
+            "name": "tooth4",
+            "content": "Disney LinaBell-style tooth."
+        },
+        {
+            "name": "tooth5",
+            "content": "Transparent colorful tooth."
+        },
+        {
+            "name": "tooth6",
+            "content": "A transparent tooth colored in red, blue and yellow."
+        },
+        {
+            "name": "tooth7",
+            "content": "Tooth with semi-opaque blue crown and red root"
+        },
+        {
+            "name": "tooth8",
+            "content": "A realistic anatomical tooth."
+        },
+        {
+            "name": "tooth9",
+            "content": "Colorful semi-opque tooth."
+        },
+        {
+            "name": "tooth10",
+            "content": "A CT scan shows a tooth with a yellowish crown, a pink layer beneath, white inner structures (pulp and canals), and a green root, all rendered to reveal its internal anatomy."
+        },
+        {
+            "name": "tooth11",
+            "content": "A CT scan of an anatomical tooth colored in rainbow."
+        },
+        {
+            "name": "tooth12",
+            "content": "A CT scan of an anatomical colorful tooth."
+        },
+        {
+            "name": "tooth13",
+            "content": "Paint all features in different colors."
+        },
+        {
+            "name": "bonsai1",
+            "content": "A potted tree with brown pot silver branch and golden leaves."
+        },
+        {
+            "name": "bonsai2",
+            "content": "A potted tree in winter."
+        },
+        {
+            "name": "bonsai3",
+            "content": "A potted tree with green leaves, wooden branch and a red pot."
+        },
+        {
+            "name": "bonsai4",
+            "content": "A potted tree with golden leaves, wooden branch, and brown pot."
+        },
+        {
+            "name": "bonsai5",
+            "content": "A potted tree with green leaves, wooden branch, and black pot."
+        },
+        {
+            "name": "bonsai6",
+            "content": "Tree with golden leaves, gray branch and brown pot. "
+        },
+        {
+            "name": "bonsai7",
+            "content": "Tree in Studio Ghibli art style."
+        },
+        {
+            "name": "tacc_turbulence1",
+            "content": "A volume rendering of a turbulent flow in a pipe with blue outline, red fluid."
+        },
+        {
+            "name": "csafe_heptane1",
+            "content": "Colorful scene."
+        },
+        {
+            "name": "fish1",
+            "content": "A fish with red skull and semi-opaque black outline."
+        },
+        {
+            "name": "hand1",
+            "content": "Realistic hand."
+        },
+        {
+            "name": "jet1",
+            "content": "A vibrant, mesmerizing flame with multicolored hues dancing and intertwining."
+        },
+        {
+            "name": "hurricane1",
+            "content": "A hurricane with a red center and blue surrounding area, showcasing the swirling motion and intensity of the storm."
+        }
+    ]
+}

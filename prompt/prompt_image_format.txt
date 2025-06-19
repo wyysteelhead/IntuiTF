@@ -1,0 +1,50 @@
+Our task here is to compare two volume-rendered images against a reference style image, all for the same {VOLUME_NAME}.
+We want to decide which volume-rendered image better matches the style of the reference image.
+
+# Instruction
+You will see an image containing three parts:
+1. The leftmost part shows a reference image representing the desired style. Note that this reference image may not be rendered from the same volume.
+2. The middle part shows a volume-rendered image created using transfer function 1, enclosed in a red box.
+3. The rightmost part shows a volume-rendered image created using transfer function 2, enclosed in a red box.
+
+Please focus on comparing the middle and right images (inside red boxes) against the leftmost reference style image.
+We would like to determine which of the two volume-rendered images better matches the style of the reference image from the following aspects:
+
+{ASPECTS}
+
+First, please provide a detailed description of the reference image (leftmost). In your description, analyze each structural part of the volume separately, describing its style, color, opacity level, and any other notable visual characteristics. Pay attention to how different parts transition into each other and their relative prominence in the overall rendering. This detailed breakdown by parts will serve as a foundation for your comparison.
+
+When comparing the middle and right images to the reference, please ignore differences in background color. Focus only on the style of the rendered volume itself.
+
+Take a really close look at all three images before providing your answer, paying special attention to how the middle and right images compare to the reference style in the leftmost image.
+
+When evaluating these aspects, focus on one of them at a time.
+
+Try to make independent decision between these criteria.
+
+# Output format
+To provide an answer, first describe the reference image in detail. Then provide a short analysis for each of the evaluation criteria.
+The analysis should be very concise and accurate.
+
+For each of the criteria, you need to make a decision using these three options:
+1. Middle (object 1) better matches the reference style;
+2. Right (object 2) better matches the reference style;
+3. Cannot decide.
+IMPORTANT: PLEASE USE THE THIRD OPTION SPARSELY. If you cannot extract any meaningful information from the images (e.g., too blurry, too dark, or no visible structure), you should choose option 3 for that criterion. Otherwise, you must try your best to make a decision, even if the images are low quality.
+
+And then, in the last row, summarize your final decision by "<option for critera 1> <option for criteria 2> <option for critera 3>".
+
+An example output looks like follows:
+"
+Reference Image Description:
+[Detailed description of the reference image including different parts of the volume, colors, opacities, and other visual characteristics]
+
+Analysis:
+
+{ANSWER_EXAMPLE}
+
+Final answer:
+{FINAL_ANSWER_EXAMPLE}
+"
+
+If you are unable to see the image, answer "NOT FOUND" instead of fake answer.
