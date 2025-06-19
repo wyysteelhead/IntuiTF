@@ -23,13 +23,13 @@
 <br />
 <div align="center">
   <a href="https://github.com/wyysteelhead/GeneticDVR">
-    <img src="images/cover.png" alt="Logo" width="700" height="350">
+    <img src="images/teaser.png" alt="Logo" width="700" height="350">
   </a>
 
   <h1 align="center">What You Think Is What You Get</h3>
 
   <p align="center">
-  We designed a transfer function (TF) design system that effectively supports volumetric data visualization. Our system allows users to intuitively specify visualization goals through multimodal interactions, automatically generates transfer functions by combining visual feedback and user knowledge, and efficiently evaluates visualization quality using a vision-language model. Compared to existing approaches, our method offers more intuitive user interaction, improved automation, stronger generalizability to various datasets, and higher efficiency in achieving desirable visual results.
+  We present WYTWYG (What You Think Is What You Get), a novel framework that bridges the semantic gap between user intent and transfer function design in Direct Volume Rendering. Our system allows users to intuitively specify visualization goals through multimodal interactions through two core innovations: (1) an evolution-based TF space explorer that effectively navigates the vast parameter space, and (2) a generalized quality evaluator powered by Multi-modal Large Language Models (MLLMs) that provides intelligent visual guidance. Through these components, users can intuitively express their visualization goals while the system automatically optimizes TFs to match their intent. Our framework demonstrates superior generalizability across various volumetric datasets and significantly improves the efficiency of TF design compared to traditional approaches.
   </p>
 </div>
 
@@ -67,7 +67,6 @@ Below is a demonstration of the GeneticDVR system in action:
 
 
 <!-- ABOUT THE PROJECT -->
-# GeneticDVR: Intuitive Transfer Function Design for Volumetric Data Visualization
 
 ## About The Project
 
