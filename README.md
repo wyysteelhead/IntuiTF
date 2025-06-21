@@ -64,19 +64,20 @@
 
 ## About The Project
 
-TFEvolve is an intuitive transfer function (TF) design system for volumetric data visualization. Our goal is to make the process of specifying visualization goals more natural and efficient for users.
+WYTWYG (What You Think Is What You Get) is an intelligent transfer function (TF) design framework that bridges the semantic gap between user visual intent and transfer function design in Direct Volume Rendering. By leveraging Multi-modal Large Language Models (MLLMs), our system makes volumetric data visualization more intuitive and efficient.
 
-Here's what makes TFEvolve special:
-* 🚀 **Intuitive Interaction:** Specify visualization goals using multimodal interactions.
-* 🤖 **Automated TF Design:** Combines visual feedback to automatically refine transfer functions.
-* 🧠 **Smart Evaluation:** Uses a vision-language model to efficiently evaluate visualization quality.
-* 📊 **Generalizable & Efficient:** Works with various datasets and achieves desirable visual results faster than traditional methods.
+Here's what makes WYTWYG special:
+* 🎯 **Intent-Driven Design:** Bridges the semantic gap between user visual intent and transfer function parameters through intelligent automation.
+* 🧬 **Evolution-Based Explorer:** Employs genetic algorithms with efficient TF encoding for effective exploration of the vast parameter space.
+* 🤖 **MLLM-Powered Evaluator:** Uses Multi-modal Large Language Models to provide human-aligned visual quality assessment and intent matching.
+* 🔄 **Three-Stage Optimization:** Formalizes expert TF design process into Trial, Insight, and Replanning stages for systematic optimization.
+* 🌐 **Superior Generalizability:** Demonstrates effectiveness across various volumetric datasets and visualization scenarios.
 
-Compared to existing approaches, TFEvolve offers:
-- More intuitive user interaction
-- Improved automation
-- Stronger generalizability
-- Higher efficiency
+Compared to existing approaches, WYTWYG offers:
+- Reduced semantic gap between user intent and TF design
+- Automated optimization guided by human-aligned evaluation
+- Enhanced generalizability across diverse datasets
+- Improved efficiency in achieving desired visualization results
 
 We welcome suggestions and contributions! Feel free to fork the repo, create a pull request, or open an issue.
 
