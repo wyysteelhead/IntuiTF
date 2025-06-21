@@ -762,7 +762,7 @@ class GeneticAlgorithm:
             fitness = (n - rank + 1) ** current_pressure
             population[i].rating = fitness
     
-    def roulette_and_elite(self, population, population_size, bound, generations, mode="quality", save_path=".", text_interval = None, num_workers=None):
+    def roulette_and_elite(self, population, population_size, bound, generations, mode="quality", save_path=".", intent_interval = None, num_workers=None):
         """
         Perform selection combining roulette wheel and elitism.
 
@@ -773,7 +773,7 @@ class GeneticAlgorithm:
             generations (int): Total number of generations
             mode (str, optional): Evaluation mode. Defaults to "quality"
             save_path (str, optional): Path to save results. Defaults to "."
-            text_interval (int, optional): Interval for text-based evaluation. Defaults to None
+            intent_interval (int, optional): Interval for text-based evaluation. Defaults to None
             num_workers (int, optional): Number of parallel workers. Defaults to None
 
         Returns:
@@ -818,7 +818,7 @@ class GeneticAlgorithm:
         self, 
         bound, 
         save_path='.',
-        text_interval=10
+        intent_interval=10
     ):
         """
         Run evaluation phase of the genetic algorithm.
@@ -826,7 +826,7 @@ class GeneticAlgorithm:
         Args:
             bound (Bound): Parameter boundaries
             save_path (str, optional): Path to save results. Defaults to '.'
-            text_interval (int, optional): Interval for text-based evaluation. Defaults to 10
+            intent_interval (int, optional): Interval for text-based evaluation. Defaults to 10
         """
         os.makedirs(save_path, exist_ok=True)
         population = self.population
@@ -836,7 +836,7 @@ class GeneticAlgorithm:
         
         for id, individual in enumerate(population):
             individual.reset_matching(id)
-        if self.iteration >= text_interval:
+        if self.iteration >= intent_interval:
             mode = 'text'
         else:
             mode = 'quality'
@@ -903,7 +903,7 @@ class GeneticAlgorithm:
         population_size=50, 
         generations=10, 
         save_path='.',
-        text_interval=10
+        intent_interval=10
     ):
         """
         Run the complete genetic algorithm.
@@ -913,7 +913,7 @@ class GeneticAlgorithm:
             population_size (int, optional): Size of population. Defaults to 50
             generations (int, optional): Number of generations. Defaults to 10
             save_path (str, optional): Path to save results. Defaults to '.'
-            text_interval (int, optional): Interval for text-based evaluation. Defaults to 10
+            intent_interval (int, optional): Interval for text-based evaluation. Defaults to 10
 
         Returns:
             list: Final population
@@ -923,7 +923,7 @@ class GeneticAlgorithm:
         mode = "quality"
         population = self.population
         atexit.register(GeneticAlgorithm.save_state, population, self.iteration, mode, os.path.join(self.save_path, 'population_state_autosave.pkl'))
-        if self.iteration > text_interval:
+        if self.iteration > intent_interval:
             reset_color = True
         else:
             reset_color = False
@@ -932,13 +932,13 @@ class GeneticAlgorithm:
             timing_log = {}
             for i in range(len(population)):
                 population[i].reset_matching(i)
-            if self.iteration >= text_interval:
+            if self.iteration >= intent_interval:
                 mode = 'text'
                 if reset_color == False:
                     for i in range(len(population)):
                         population[i].random_color(bound)
                     reset_color = True
-                self.iter_bias = text_interval
+                self.iter_bias = intent_interval
                 self.genetic_config.text_mode = True
                 if self.llm_evaluator.middle_img is not None:
                     self.llm_evaluator.reset_format("image")
@@ -966,7 +966,7 @@ class GeneticAlgorithm:
                 timing_log["save"] = time.time() - start_time
                 
             evolution_time = time.time()
-            new_population=self.roulette_and_elite(population=sorted_population, population_size=population_size, bound=bound, generations=generations, mode=mode, save_path=self.save_path, text_interval=text_interval)
+            new_population=self.roulette_and_elite(population=sorted_population, population_size=population_size, bound=bound, generations=generations, mode=mode, save_path=self.save_path, intent_interval=intent_interval)
             timing_log["roulette_and_elite"] = time.time() - evolution_time
             
             population = new_population
@@ -1122,9 +1122,9 @@ def parse_args(mode="train"):
     parser.add_argument('--instruct_number', type=str, default=None, help="Instruct number or name to choose, default random.")
     parser.add_argument('--device', type=str, default="cuda", help="Device to run on (cuda / cpu), default is cuda.")
     parser.add_argument('--bg_color', type=str, default="(0, 0, 0)", help="Background color for the image.")
-    parser.add_argument('--quality_metrics', type=str, default="7", help="")
-    parser.add_argument('--text_metrics', type=str, default="5", help="")
-    parser.add_argument('--text_interval', type=int, default=5, help="")
+    parser.add_argument('--quality_metrics', type=str, default="16,11,14", help="The metrics used to evaluate rendered images' quality, default (16,11,14). Refer to ./prompt/aspects.json for more metrics info")
+    parser.add_argument('--text_metrics', type=str, default="5", help="The metrics used to evaluate rendered images' alignment with text, default 5. Refer to ./prompt/aspects.json for more metrics info")
+    parser.add_argument('--intent_interval', type=int, default=0, help="The round to start aligning with user's intent (whether image or text), default 0")
     parser.add_argument('--model_name', type=str, default="gpt-4o", help="Model name for the API.")
     parser.add_argument('--new_save_path', action='store_true', help="Whether to create a new save path.")
     parser.add_argument('--style_image', type=str, default=None, help="The styling image path.")
@@ -1190,6 +1190,6 @@ if __name__ == "__main__":
         population_size=config_manager.get_algorithm_config().population_size, 
         generations=config_manager.get_algorithm_config().generations, 
         save_path=config_manager.get_algorithm_config().save_path,
-        text_interval=config_manager.get_algorithm_config().text_interval
+        intent_interval=config_manager.get_algorithm_config().intent_interval
     )
     
