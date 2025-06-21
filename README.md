@@ -19,6 +19,20 @@
 *** https://www.markdownguide.org/basic-syntax/#reference-style-links
 -->
 
+  <h1 align="center">What You Think Is What You Get: Bridge User Intent and Transfer Function Design through Multimodal Large Language Models</h3>
+  
+<!-- PROJECT LOGO -->
+<br />
+<div align="center">
+  <a href="https://github.com/wyysteelhead/TFEvolve">
+    <img src="images/teaser.png" alt="Logo" width="700" height="400">
+  </a>
+
+
+  <p align="center">
+  📄 <a href="">arXiv</a> • 🌐 <a href="">Project Page</a>
+</p>
+
 
 <!-- TABLE OF CONTENTS -->
 <details>
@@ -40,19 +54,6 @@
   </ol>
 </details>
 
-
-<!-- PROJECT LOGO -->
-<br />
-<div align="center">
-  <a href="https://github.com/wyysteelhead/TFEvolve">
-    <img src="images/teaser.png" alt="Logo" width="700" height="400">
-  </a>
-
-  <h1 align="center">What You Think Is What You Get: Bridge User Intent and Transfer Function Design through Multimodal Large Language Models</h3>
-
-  <p align="center">
-  📄 <a href="">arXiv</a> • 🌐 <a href="">Project Page</a>
-</p>
 
   <p align="center">
   We present WYTWYG (What You Think Is What You Get), a novel framework that bridges the semantic gap between user intent and transfer function design in Direct Volume Rendering. Our system allows users to intuitively specify visualization goals through multimodal interactions through two core innovations: (1) an evolution-based TF space explorer that effectively navigates the vast parameter space, and (2) a generalized quality evaluator powered by Multi-modal Large Language Models (MLLMs) that provides intelligent visual guidance. Through these components, users can intuitively express their visualization goals while the system automatically optimizes TFs to match their intent. Our framework demonstrates superior generalizability across various volumetric datasets and significantly improves the efficiency of TF design compared to traditional approaches.
