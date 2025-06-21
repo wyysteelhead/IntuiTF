@@ -96,14 +96,14 @@ Make sure you have the following installed:
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/wyysteelhead/GeneticDVR.git
-cd GeneticDVR
+git clone https://github.com/wyysteelhead/TFevolve.git
+cd TFevolve
 ```
 
 2. Create and activate the conda environment:
 ```bash
-conda create -n geneticdvr python=3.8.8
-conda activate geneticdvr
+conda create -n tfevolve python=3.8.8
+conda activate tfevolve
 ```
 
 3. Install DiffDVR first:
@@ -119,64 +119,47 @@ cd ..
 pip install -r requirements.txt
 ```
 
-5. (Optional) Download sample volumetric datasets from the [datasets](https://github.com/wyysteelhead/GeneticDVR/tree/main/datasets) folder.
-
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 
 
 <!-- 🧑‍💻 Usage -->
 ## 🧑‍💻 Usage
 
-### Using Task Scripts
-
-The project provides task scripts for different use cases:
-
-```bash
-# For image processing tasks
-./scripts/tasks/task_image.sh
-
-# For video processing tasks
-./scripts/tasks/task_video.sh
-```
-
-### Direct Command Usage
-
-You can also run the genetic optimization directly using the `genetic.py` script. Here's the complete command structure:
+You can run the genetic optimization directly using the `genetic.py` script. Here's the complete command structure:
 
 ```bash
 python genetic_optimize/genetic.py \
-    --base_url YOUR_API_URL \
-    --api_key YOUR_API_KEY \
-    --config_file "/path/to/config.json" \
+    --base_url [YOUR_API_URL] \
+    --api_key [YOUR_API_KEY] \
+    --config_file "[/path/to/config.json]" \
     --prompt_folder ./prompt \
     --population_size 50 \
     --generations 30 \
     --save_interval 1 \
-    --instruct_number "task_name" \
-    --save_path "/path/to/save/results" \
+    --instruct_number "[task_name]" \
+    --save_path "[/path/to/save/results]" \
     --quality_metrics "16,11,14" \
     --text_metrics "5" \
-    --text_interval "16" \
+    --intent_interval "16" \
     --bg_color "(255,255,255)" \
-    --style_image "/path/to/style/image.png" \
-    --model_name "gemini-2.0-flash-001"
+    --style_image "[/path/to/style/image.png]" \
+    --model_name [MODEL_NAME]
 ```
 
 #### Command Parameters
 
 - `--base_url`: API endpoint URL
 - `--api_key`: Your API key
-- `--config_file`: Path to the dataset configuration file, our example config file locates in /root/autodl-tmp/GeneticDVR/diffdvr/config-files
-- `--prompt_folder`: Directory containing prompt templates (default: ./prompt)
+- `--config_file`: Path to the dataset configuration file, our example config file locates in ./diffdvr/config-files
+- `--prompt_folder`: Directory containing prompt templates and instructions (our settings locates in ./prompt)
 - `--population_size`: Size of the genetic algorithm population
 - `--generations`: Number of generations to run
 - `--save_interval`: How often to save results (default: 1)
-- `--instruct_number`: Unique identifier for this run
+- `--instruct_number`: The text instruction to use. Our instructions are kept in ./prompt/instructions.json. To customize your own instructon, add a new record in instructions.json, and call the unique id of the record
 - `--save_path`: Where to save the results
 - `--quality_metrics`: Quality assessment metrics defined in GeneticDVR/prompt/aspects.json (comma-separated, default: "16,11,14")
 - `--text_metrics`: Text-based metrics (default: "5")
-- `--text_interval`: Interval for text-based evaluation (default: "16")
+- `--intent_interval`: Start round of intent alignment (default: "16")
 - `--bg_color`: Background color in RGB format (default: "(255,255,255)")
 - `--style_image`: Path to style reference image
 - `--model_name`: Name of the model to use (default: "gemini-2.0-flash-001")
@@ -186,26 +169,28 @@ python genetic_optimize/genetic.py \
 1. Image-based transfer function design:
 ```bash
 python genetic_optimize/genetic.py \
-    --config_file "/root/autodl-tmp/GeneticDVR/diffdvr/config-files/feet.json" \
+    --config_file "./diffdvr/config-files/head.json" \
     --population_size 50 \
     --generations 30 \
-    --save_path "/folderFromHost/results/feet_image" \
-    --instruct_number "feet_basic" \
-    --style_image "/path/to/style/image.png"
+    --save_interval 5 \
+    --save_path "./results/head_image" \
+    --style_image "./prompt/head.png"
+    --quality_metrics "16,11,14" \
+    --intent_interval "16"
 ```
 
 2. Text-based transfer function design:
 ```bash
 python genetic_optimize/genetic.py \
-    --config_file "/root/autodl-tmp/GeneticDVR/diffdvr/config-files/engine.json" \
-    --population_size 100 \
-    --generations 50 \
+    --config_file "./diffdvr/config-files/engine.json" \
+    --population_size 50 \
+    --generations 30 \
     --save_interval 5 \
     --save_path "./results/engine_text" \
     --instruct_number "engine1" \
     --quality_metrics "16,11,14" \
     --text_metrics "5" \
-    --text_interval "16"
+    --intent_interval "16"
 ```
 
 Note: The script is typically run in a tmux session for long-running tasks. You can use the task scripts which handle this automatically, or set up your own tmux session:
@@ -276,52 +261,24 @@ GeneticDVR/
      - Runs the genetic optimization
      - Saves results
 
-3. **Data Flow**:
-   ```
-   Volume Data → genetic.py → DiffDVR → Results
-   ```
-
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-<!-- NEWS SECTION -->
-<!-- ## 📰 News
-
-Stay up to date with the latest developments and updates for this project.
-
-- 🚀 **2024-06-01**: Initial release of the GeneticDVR project.
-- 🖱️ **2024-06-10**: Added support for multimodal interaction in transfer function design.
-- 🤖 **2024-06-15**: Integrated vision-language model for visualization quality evaluation. -->
 
 ## ✅ TODO
 
 Here are some planned features and improvements for GeneticDVR:
 
 - [ ] Add support for additional volumetric data formats
-- [ ] Improve user interface for transfer function editing
-- [ ] Enhance documentation with more usage examples
-- [ ] Implement real-time collaborative editing
-- [ ] Expand evaluation metrics for visualization quality
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-<!-- 📄 License -->
-## 📄 License
-
-Distributed under the MIT License. See `LICENSE.txt` for more information.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
 
 <!-- 📬 Contact -->
 ## 📬 Contact
 
-Project Lead: wyysteelhead  
-Email: wyysteelhead@gmail.com
+Project Lead: Yiyao Wang
+Email: wangyiyao@zju.edu.cn
 
-Project Link: [https://github.com/wyysteelhead/GeneticDVR](https://github.com/wyysteelhead/GeneticDVR)
+Project Link: [https://github.com/wyysteelhead/TFevolve](https://github.com/wyysteelhead/TFevolve)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -333,12 +290,12 @@ Project Link: [https://github.com/wyysteelhead/GeneticDVR](https://github.com/wy
 If you use GeneticDVR in your research, please cite our work:
 
 ```bibtex
-@misc{geneticdvr2024,
-  title        = {GeneticDVR: Intuitive Transfer Function Design for Volumetric Data Visualization},
-  author       = {Your Name and Collaborators},
-  year         = {2024},
-  howpublished = {\url{https://github.com/wyysteelhead/GeneticDVR}},
-  note         = {Initial release}
+@misc{wang2025whatyouthink,
+  title        = {What You Think Is What You Get: Bridge User Intent and Transfer Function Design through Multimodal Large Language Models},
+  author       = {Wang, Yiyao and Pan, Bo and Wang, Ke and Liu, Han and Mao, Jinyuan and Liu, Yuxin and Zhu, Minfeng and Zhang, Bo and Chen, Weifeng and Huang, Xiuqi and Chen, Wei},
+  year         = {2025},
+  publisher    = {arXiv},
+  howpublished = {\url{https://github.com/wyysteelhead/TFevolve}}
 }
 ```
 
