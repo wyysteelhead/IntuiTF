@@ -20,6 +20,10 @@
 -->
 
   <h1 align="center">What You Think Is What You Get: Bridge User Intent and Transfer Function Design through Multimodal Large Language Models</h3>
+
+  <p align="center">
+  📄 <a href="">arXiv</a> • 🌐 <a href="">Project Page</a>
+</p>
   
 <!-- PROJECT LOGO -->
 <br />
@@ -28,10 +32,6 @@
     <img src="images/teaser.png" alt="Logo" width="700" height="400">
   </a>
 
-
-  <p align="center">
-  📄 <a href="">arXiv</a> • 🌐 <a href="">Project Page</a>
-</p>
 
 
 <!-- TABLE OF CONTENTS -->
