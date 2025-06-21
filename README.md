@@ -22,8 +22,8 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/wyysteelhead/GeneticDVR">
-    <img src="images/teaser.png" alt="Logo" width="700" height="350">
+  <a href="https://github.com/wyysteelhead/TFEvolve">
+    <img src="images/teaser.png" alt="Logo" width="700" height="400">
   </a>
 
   <h1 align="center">What You Think Is What You Get</h3>
@@ -59,15 +59,15 @@
 
 ## About The Project
 
-GeneticDVR is an intuitive transfer function (TF) design system for volumetric data visualization. Our goal is to make the process of specifying visualization goals more natural and efficient for users.
+TFEvolve is an intuitive transfer function (TF) design system for volumetric data visualization. Our goal is to make the process of specifying visualization goals more natural and efficient for users.
 
-Here's what makes GeneticDVR special:
+Here's what makes TFEvolve special:
 * 🚀 **Intuitive Interaction:** Specify visualization goals using multimodal interactions.
 * 🤖 **Automated TF Design:** Combines visual feedback to automatically refine transfer functions.
 * 🧠 **Smart Evaluation:** Uses a vision-language model to efficiently evaluate visualization quality.
 * 📊 **Generalizable & Efficient:** Works with various datasets and achieves desirable visual results faster than traditional methods.
 
-Compared to existing approaches, GeneticDVR offers:
+Compared to existing approaches, TFEvolve offers:
 - More intuitive user interaction
 - Improved automation
 - Stronger generalizability
@@ -82,7 +82,7 @@ We welcome suggestions and contributions! Feel free to fork the repo, create a p
 <!-- 🚀 Getting Started -->
 ## 🚀 Getting Started
 
-Follow these steps to set up GeneticDVR locally.
+Follow these steps to set up TFEvolve locally.
 
 ### 🛠️ Prerequisites
 
@@ -157,7 +157,7 @@ python genetic_optimize/genetic.py \
 - `--save_interval`: How often to save results (default: 1)
 - `--instruct_number`: The text instruction to use. Our instructions are kept in ./prompt/instructions.json. To customize your own instructon, add a new record in instructions.json, and call the unique id of the record
 - `--save_path`: Where to save the results
-- `--quality_metrics`: Quality assessment metrics defined in GeneticDVR/prompt/aspects.json (comma-separated, default: "16,11,14")
+- `--quality_metrics`: Quality assessment metrics defined in TFEvolve/prompt/aspects.json (comma-separated, default: "16,11,14")
 - `--text_metrics`: Text-based metrics (default: "5")
 - `--intent_interval`: Start round of intent alignment (default: "16")
 - `--bg_color`: Background color in RGB format (default: "(255,255,255)")
@@ -209,7 +209,7 @@ tmux send-keys -t "task_name" "python genetic_optimize/genetic.py [parameters...
 ## Project Structure
 
 ```
-GeneticDVR/
+TFEvolve/
 ├── diffdvr/              # DiffDVR integration and configuration
 │   ├── config-files/     # Configuration files for different datasets
 │   ├── parametrizations.py # Parameter definitions
@@ -242,7 +242,6 @@ GeneticDVR/
 ├── prompt/             # Prompt templates and assets
 │   ├── instructions.json # Instructions examples
 │   └── prompt_format.txt # Standard format of prompt
-├── scripts/            # Task execution scripts
 ├── volumes/           # Volume data files, currently support cvol volume files
 └── requirements.txt   # Project dependencies
 ```
@@ -265,7 +264,7 @@ GeneticDVR/
 
 ## ✅ TODO
 
-Here are some planned features and improvements for GeneticDVR:
+Here are some planned features and improvements for TFEvolve:
 
 - [ ] Add support for additional volumetric data formats
 
@@ -287,7 +286,7 @@ Project Link: [https://github.com/wyysteelhead/TFevolve](https://github.com/wyys
 <!-- ACKNOWLEDGMENTS -->
 ## 📚 BibTeX
 
-If you use GeneticDVR in your research, please cite our work:
+If you use TFEvolve in your research, please cite our work:
 
 ```bibtex
 @misc{wang2025whatyouthink,
