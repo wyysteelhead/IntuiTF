@@ -33,17 +33,6 @@
   </p>
 </div>
 
-## 🎬 Demo
-
-Below is a demonstration of the GeneticDVR system in action:
-
-<div align="center">
-  <video src="images/demo.mp4" width="800" controls>
-    Your browser does not support the video tag.
-  </video>
-</div>
-
-
 <!-- TABLE OF CONTENTS -->
 <details>
   <summary>Table of Contents</summary>
