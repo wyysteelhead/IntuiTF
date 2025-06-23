@@ -22,7 +22,7 @@
   <h1 align="center">What You Think Is What You Get: Bridge User Intent and Transfer Function Design through Multimodal Large Language Models</h3>
 
   <p align="center">
-  📄 <a href="">arXiv</a> • 🌐 <a href="https://wyysteelhead.github.io/TFEvolve.github.io/">Project Page</a>
+  📄 <a href="">arXiv</a> • 🌐 <a href="https://zjuvai.cn/TFEvolve/">Project Page</a>
 </p>
   
 <!-- PROJECT LOGO -->
