@@ -12,7 +12,6 @@ import uuid
 from datetime import datetime
 from genetic_optimize.api.gemini import GeminiAPI
 from genetic_optimize.api.openai import OpenAIAPI
-from genetic_optimize.states.direction import Direction
 from genetic_optimize.utils.image_utils import *
 from genetic_optimize.utils.file_utils import *
 from genetic_optimize.states.evaluation_state import *

@@ -13,7 +13,9 @@ import json
 import os
 from typing import Optional, NamedTuple
 
-from diffdvr.utils import make_real3, renderer_dtype_torch, renderer_dtype_np
+from diffdvr.utils import make_real3
+from genetic_optimize.utils.dtype_utils import get_renderer_dtypes
+renderer_dtype_torch, renderer_dtype_np = get_renderer_dtypes("diffdvr")
 import pyrenderer
 
 """
@@ -43,8 +45,10 @@ class Settings:
             t = self.get_synthetic_dataset_type()
             return t.name
         else:
-            path = self._data["dataset"]["file"]
-            return os.path.split(path)[-1]
+            path = self._data["dataset"]["cvol_file"]
+            project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+            abs_path = os.path.abspath(os.path.join(project_root, path))
+            return os.path.split(abs_path)[-1]
 
     def load_dataset(self, resolution : Optional[int] = None) -> pyrenderer.Volume:
         """
@@ -60,7 +64,7 @@ class Settings:
             t = self.get_synthetic_dataset_type()
             return pyrenderer.Volume.create_implicit(t, resolution)
         else:
-            path = self._data["dataset"]["file"].replace("\\", "/")
+            path = self._data["dataset"]["cvol_file"].replace("\\", "/")
             if not os.path.isabs(path):
                 path = os.path.abspath(os.path.join(self._filepath, path))
                 print("convert relative path to absolute path, load", path)
@@ -74,7 +78,7 @@ class Settings:
         :return: the volume, still only on the CPU
         """
 
-        path = self._data["dataset"]["file"].replace("\\", "/")
+        path = self._data["dataset"]["cvol_file"].replace("\\", "/")
         if not os.path.isabs(path):
             path = os.path.abspath(os.path.join(self._filepath, path))
             print("convert relative path to absolute path, load", path)

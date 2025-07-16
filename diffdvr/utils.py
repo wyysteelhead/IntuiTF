@@ -25,8 +25,8 @@ except ModuleNotFoundError:
 def __cleanup_renderer():
   pyrenderer.cleanup()
 
-renderer_dtype_torch = torch.float64 if pyrenderer.use_double_precision() else torch.float32
-renderer_dtype_np = np.float64 if pyrenderer.use_double_precision() else np.float32
+# renderer_dtype_torch = torch.float64 if pyrenderer.use_double_precision() else torch.float32
+# renderer_dtype_np = np.float64 if pyrenderer.use_double_precision() else np.float32
 
 def make_real3(vector):
   return pyrenderer.real3(vector[0], vector[1], vector[2])

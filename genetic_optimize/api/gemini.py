@@ -1,7 +1,6 @@
 import json
 import requests
 from genetic_optimize.api.llmapi import LLMAPI
-import google.generativeai as genai
 
 
 class GeminiAPI(LLMAPI):

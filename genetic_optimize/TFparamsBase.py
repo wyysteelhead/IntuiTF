@@ -1,4 +1,3 @@
-
 from abc import abstractmethod
 import colorsys
 import io
@@ -7,17 +6,18 @@ import tempfile
 import cv2
 from matplotlib import pyplot as plt
 import numpy as np
-import torch
+# import torch
 from genetic_optimize.states.bound import Bound
-from diffdvr import renderer_dtype_torch, renderer_dtype_np
-from genetic_optimize.states.direction import Direction
+from genetic_optimize.utils.dtype_utils import get_renderer_dtypes
+# from genetic_optimize.states.direction import Direction
 from genetic_optimize.states.gaussian import Gaussian
 from genetic_optimize.states.genetic_config import GeneticConfig
 from genetic_optimize.utils.image_utils import add_red_border, apply_semi_transparent_background, image_to_base64_pil
 from genetic_optimize.utils.thread import ParallelExecutor
-import pyrenderer
+# import pyrenderer
 from PIL import Image
 import uuid
+import torch
 from PIL import ImageFilter, ImageDraw, ImageEnhance
 
 class TFparamsBase:    
@@ -26,13 +26,15 @@ class TFparamsBase:
     max_opacity=1.0
     min_opacity=0.0
     bg_color = (0,0,0)
-    
-    def __init__(self, id: int, bound : Bound = None, initial_rating=1600, W = 512, H = 512, bg_color = None, device="cuda", tfparams = None):
+    renderer_dtype_np = np.float64
+
+    def __init__(self, id: int, bound : Bound = None, initial_rating=1600, W = 512, H = 512, bg_color = None, device="cuda", renderer_dtype_np = np.float64, tfparams = None):
         self.image = None
         self.img_str = None
         self.initial_rating=initial_rating
         self.parent_id = None
         self.inputs = None
+        self.renderer_dtype_np = renderer_dtype_np
         if bg_color is not None:
             TFparamsBase.bg_color = bg_color
         if bound:
@@ -191,19 +193,19 @@ class TFparamsBase:
     def __gen_opacity(self, bound : Bound, num=None):
         if num == None: 
             num = self.gmm_num
-        x = np.random.uniform(bound.opacity_bound.x[0], bound.opacity_bound.x[1], size=(num, 1)).astype(renderer_dtype_np)
-        y = np.random.uniform(bound.opacity_bound.y[0], bound.opacity_bound.y[1], size=(num, 1)).astype(renderer_dtype_np)
-        bandwidth = np.random.uniform(bound.opacity_bound.bandwidth[0], bound.opacity_bound.bandwidth[1], size=(num, 1)).astype(renderer_dtype_np)
+        x = np.random.uniform(bound.opacity_bound.x[0], bound.opacity_bound.x[1], size=(num, 1)).astype(self.renderer_dtype_np)
+        y = np.random.uniform(bound.opacity_bound.y[0], bound.opacity_bound.y[1], size=(num, 1)).astype(self.renderer_dtype_np)
+        bandwidth = np.random.uniform(bound.opacity_bound.bandwidth[0], bound.opacity_bound.bandwidth[1], size=(num, 1)).astype(self.renderer_dtype_np)
         opacity = np.concatenate((x, bandwidth, y), axis=1)
         # Sort according to x values (first column), smallest x at the front
         return opacity[opacity[:, 0].argsort()]
     
     def __gen_hsl(self, bound : Bound, num):
-        hues = np.random.uniform(low=bound.color_bound.hues[0], high=bound.color_bound.hues[1], size=(num,)).astype(renderer_dtype_np)
-        saturations = np.random.uniform(low=bound.color_bound.saturations[0], high=bound.color_bound.saturations[1], size=(num,)).astype(renderer_dtype_np)
-        lightnesses = np.random.uniform(low=bound.color_bound.lightnesses[0], high=bound.color_bound.lightnesses[1], size=(num,)).astype(renderer_dtype_np)
+        hues = np.random.uniform(low=bound.color_bound.hues[0], high=bound.color_bound.hues[1], size=(num,)).astype(self.renderer_dtype_np)
+        saturations = np.random.uniform(low=bound.color_bound.saturations[0], high=bound.color_bound.saturations[1], size=(num,)).astype(self.renderer_dtype_np)
+        lightnesses = np.random.uniform(low=bound.color_bound.lightnesses[0], high=bound.color_bound.lightnesses[1], size=(num,)).astype(self.renderer_dtype_np)
         colors_hsl = np.column_stack((hues, saturations, lightnesses))
-        colors_rgb = np.asarray(np.apply_along_axis(lambda x: np.array(colorsys.hls_to_rgb(x[0], x[2], x[1]), dtype=renderer_dtype_np), 1, colors_hsl))
+        colors_rgb = np.asarray(np.apply_along_axis(lambda x: np.array(colorsys.hls_to_rgb(x[0], x[2], x[1]), dtype=self.renderer_dtype_np), 1, colors_hsl))
         color = np.random.permutation(colors_rgb)
         return color
 
@@ -441,9 +443,7 @@ class TFparamsBase:
         
         return [child1, child2]
         
-    def mutate(self, bound: Bound, genetic_config: GeneticConfig, iter=0, maxiter=10, directions: Direction = None):
-        if directions is None:
-            directions = Direction()
+    def mutate(self, bound: Bound, genetic_config: GeneticConfig, iter=0, maxiter=10, directions = None):
         def mutate_param(rate_factor, scale_factor, bound, param, direction):
             if random.random() < rate_factor:
                 dx = np.random.normal(0, scale_factor * (bound[1] - bound[0]))
@@ -464,11 +464,11 @@ class TFparamsBase:
             
             pitch, yaw, distance, center, fov = self.camera
             # Use mutate_param function to apply mutations to each camera parameter
-            pitch = mutate_param(rate_factor, scale_factor, camera_bound.pitch, pitch, directions.camera.pitch if hasattr(directions.camera, 'pitch') else None)
-            yaw = mutate_param(rate_factor, scale_factor, camera_bound.yaw, yaw, directions.camera.yaw if hasattr(directions.camera, 'yaw') else None)
-            distance = mutate_param(rate_factor, scale_factor, camera_bound.distance, distance, directions.camera.distance if hasattr(directions.camera, 'distance') else None)
+            pitch = mutate_param(rate_factor, scale_factor, camera_bound.pitch, pitch, directions.camera.pitch if directions is not None and hasattr(directions.camera, 'pitch') else None)
+            yaw = mutate_param(rate_factor, scale_factor, camera_bound.yaw, yaw, directions.camera.yaw if directions is not None and hasattr(directions.camera, 'yaw') else None)
+            distance = mutate_param(rate_factor, scale_factor, camera_bound.distance, distance, directions.camera.distance if directions is not None and hasattr(directions.camera, 'distance') else None)
             # Center is not mutated as per original code
-            fov = mutate_param(rate_factor, scale_factor, camera_bound.fov, fov, directions.camera.fov if hasattr(directions.camera, 'fov') else None)
+            fov = mutate_param(rate_factor, scale_factor, camera_bound.fov, fov, directions.camera.fov if directions is not None and hasattr(directions.camera, 'fov') else None)
             self.camera = (pitch, yaw, distance, center, fov)
         
         # 2. Mutate opacity parameters
@@ -486,11 +486,11 @@ class TFparamsBase:
                 if self.gaussians[i].is_frozen():
                     continue
                 if genetic_config.text_mode == False:
-                    x = mutate_param(rate_factor, x_scale_factor, opacity_bound.x, self.gaussians[i].opacity[0], directions.opacity.x if hasattr(directions.opacity, 'x') else None)
+                    x = mutate_param(rate_factor, x_scale_factor, opacity_bound.x, self.gaussians[i].opacity[0], directions.opacity.x if directions is not None and hasattr(directions.opacity, 'x') else None)
                 else:
-                    x = mutate_param(rate_factor * 0.1, x_scale_factor * 0.1, opacity_bound.x, self.gaussians[i].opacity[0], directions.opacity.x if hasattr(directions.opacity, 'x') else None)
-                bandwidth = mutate_param(rate_factor, bandwidth_scale_factor, opacity_bound.bandwidth, self.gaussians[i].opacity[1], directions.opacity.bandwidth if hasattr(directions.opacity, 'bandwidth') else None)
-                y = mutate_param(rate_factor, op_scale_factor, opacity_bound.y, self.gaussians[i].opacity[2], directions.opacity.y if hasattr(directions.opacity, 'y') else None)
+                    x = mutate_param(rate_factor * 0.1, x_scale_factor * 0.1, opacity_bound.x, self.gaussians[i].opacity[0], directions.opacity.x if directions is not None and hasattr(directions.opacity, 'x') else None)
+                bandwidth = mutate_param(rate_factor, bandwidth_scale_factor, opacity_bound.bandwidth, self.gaussians[i].opacity[1], directions.opacity.bandwidth if directions is not None and hasattr(directions.opacity, 'bandwidth') else None)
+                y = mutate_param(rate_factor, op_scale_factor, opacity_bound.y, self.gaussians[i].opacity[2], directions.opacity.y if directions is not None and hasattr(directions.opacity, 'y') else None)
                 
                 self.gaussians[i].opacity = np.array([x, bandwidth, y])
                 
@@ -527,7 +527,7 @@ class TFparamsBase:
                         # channel = random.randint(0, 2)
                         # if channel == 0:  # 变异色相(hue)
                         if random.random() < rate_factor:
-                            if directions.color.hues is not None:
+                            if directions is not None and directions.color.hues is not None:
                                 hues = directions.color.hues
                             else:
                                 # 感知敏感的色相变异改进（保持0-1范围）
@@ -547,11 +547,11 @@ class TFparamsBase:
                         # elif channel == 1:  # Saturation mutation
                         saturations = mutate_param(rate_factor, SL_scale_factor, color_bound.saturations, 
                                                         saturations, 
-                                                        directions.color.saturations if hasattr(directions.color, 'saturations') else None)
+                                                        directions.color.saturations if directions is not None and hasattr(directions.color, 'saturations') else None)
                         # else:  # Lightness mutation
                         lightnesses = mutate_param(rate_factor, SL_scale_factor, color_bound.lightnesses, 
                                                         lightnesses,
-                                                        directions.color.lightnesses if hasattr(directions.color, 'lightnesses') else None)
+                                                        directions.color.lightnesses if directions is not None and hasattr(directions.color, 'lightnesses') else None)
                         
                         # 转换回RGB
                         r, g, b = colorsys.hls_to_rgb(hues, lightnesses, saturations)
@@ -567,12 +567,44 @@ class TFparamsBase:
     def render_image_on_sphere(self, num_views=300, device="cuda", bg_color=None):
         pass
         
+    def get_tf(self, color=None, opacity=None):
+        """生成传递函数张量"""
+        # 按不透明度x坐标排序高斯点
+        self.gaussians = sorted(self.gaussians, key=lambda x: x.opacity[0])
+        
+        if opacity is None:
+            for i in range(len(self.gaussians)):
+                # 堆叠不透明度
+                if i == 0:
+                    opacity = np.array([self.gaussians[i].opacity])
+                else:
+                    opacity = np.vstack([opacity, self.gaussians[i].opacity])
+                    
+        if color is None:
+            for i in range(len(self.gaussians)):
+                # 堆叠颜色
+                if i == 0:
+                    color = np.array([self.gaussians[i].color])
+                else:
+                    color = np.vstack([color, self.gaussians[i].color])
+                    
+        color = np.concatenate((opacity[:, 0:1], color), axis=1)
+                    
+        c_left = np.array([[0, self.gaussians[0].color[0], self.gaussians[0].color[1], self.gaussians[0].color[2]]], dtype=self.renderer_dtype_np)
+        c_right = np.array([[self.tf_size, self.gaussians[-1].color[0], self.gaussians[-1].color[1], self.gaussians[-1].color[2]]], dtype=self.renderer_dtype_np)
+        color = np.vstack([c_left, color, c_right])
+        opacity, color = self.__update_x(opacity, color)
+        
+        color_tf = self.__gen_ctf_from_gmm(color, 0, 255)
+        opacity_tf = self.__gen_otf_from_gmm(opacity, 0, 255)
+        ctf = color_tf[:, 1:]
+        otf = opacity_tf[:, 1:]
+        tf = np.concatenate([ctf, otf], axis=1)
+        tf = torch.from_numpy(np.array([tf], dtype=self.renderer_dtype_np)).to(device=self.device)
+        return tf
+        
     @abstractmethod
     def render_image(self, device="cuda", bg_color=None, force_render=False, setImage=True, addRedBorder=False, tf=None, transparent = False):
-        pass
-    
-    @abstractmethod
-    def get_tf(self, color = None, opacity = None):
         pass
     
     def check_gaussian_id(self):
@@ -858,3 +890,51 @@ class TFparamsBase:
         # 恢复原始相机参数
         self.camera = original_camera
         return output_buffer
+
+    def __gen_ctf_from_gmm(self, color_mat, min_scalar_value, max_scalar_value):
+        """从高斯混合模型生成颜色传递函数"""
+        sort_color_mat = np.unique(color_mat, axis=0)  # 去重并排序
+        color_mat[0, 1:] = color_mat[1, 1:]  # 保证第一个颜色点和第二个颜色点相同
+        color_mat[-1, 1:] = color_mat[-2, 1:]  # 保证最后一个颜色点和倒数第二个颜色点相同
+        cur_color_ind = 0
+        color_map = np.zeros((self.tf_size, 4))
+        
+        for idx in range(self.tf_size):
+            interp = idx / (self.tf_size - 1)
+            scalar_val = min_scalar_value + interp * (max_scalar_value - min_scalar_value)
+            color_map[idx, 0] = scalar_val
+            
+            while cur_color_ind < len(sort_color_mat) - 2 and scalar_val > sort_color_mat[cur_color_ind+1, 0]:
+                cur_color_ind += 1
+
+            cur_color_sv = sort_color_mat[cur_color_ind, 0]
+            next_color_sv = sort_color_mat[cur_color_ind+1, 0]
+            
+            if next_color_sv == cur_color_sv:
+                scalar_val_interp = 0
+            else:
+                scalar_val_interp = (scalar_val - cur_color_sv) / (next_color_sv - cur_color_sv)
+            
+            color_map[idx, 1:] = sort_color_mat[cur_color_ind, 1:] + scalar_val_interp * \
+                (sort_color_mat[cur_color_ind + 1, 1:] - sort_color_mat[cur_color_ind, 1:])
+        
+        return color_map
+    
+    def __gen_otf_from_gmm(self, opacity_gmm, min_scalar_value, max_scalar_value):
+        """从高斯混合模型生成不透明度传递函数"""
+        opacity_map = np.zeros((self.tf_size, 2))
+        for idx in range(self.tf_size):
+            interp = float(idx)/(self.tf_size-1)
+            scalar_val = min_scalar_value+interp * \
+                (max_scalar_value-min_scalar_value)
+            gmm_sample = np.sum(opacity_gmm[:, 2] * np.exp(-np.power(
+                (scalar_val - opacity_gmm[:, 0]), 2) / np.power(opacity_gmm[:, 1], 2)))
+            gmm_sample = max(TFparamsBase.min_opacity, min(TFparamsBase.max_opacity, gmm_sample))
+            opacity_map[idx, 0] = scalar_val
+            opacity_map[idx, 1] = gmm_sample
+        return opacity_map
+    
+    def __update_x(self, opacity, color):
+        """更新颜色点的x坐标以匹配不透明度点"""
+        # 这里需要根据具体需求实现
+        return opacity, color

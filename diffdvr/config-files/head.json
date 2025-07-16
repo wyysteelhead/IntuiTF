@@ -29,7 +29,7 @@
         "zoomValue": 4.0
     },
     "dataset": {
-        "file": "/root/autodl-tmp/GeneticDVR/volumes/vmhead256cubed.cvol",
+        "file": "./volumes/vmhead256cubed.cvol",
         "mipmap": 0,
         "syntheticDataset": -1,
         "syntheticDatasetResolutionPower": 6,

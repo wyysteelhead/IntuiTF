@@ -4,10 +4,9 @@ from PIL import Image, ImageDraw
 import cv2
 import numpy as np
 from joblib import Parallel, delayed
-import torch
-from diffdvr import renderer_dtype_torch, renderer_dtype_np
-import torch.nn.functional as F
-from torchvision import transforms
+# from diffdvr import renderer_dtype_torch, renderer_dtype_np
+# import torch.nn.functional as F
+# from torchvision import transforms
 
 #图片转base64函数
 def encode_image(image_path):
@@ -185,38 +184,6 @@ def apply_semi_transparent_background(image, opacity=0.4, bg_color=(255, 255, 25
     
     # 转换为RGB格式
     return result.convert('RGB')
-    
-def compute_ssim(imageA, imageB, device="cuda", window_size=11, size_average=True, val_range=255):
-    # 转换为灰度图像（如果是彩色图像）并转换为张量
-    transform = transforms.Compose([transforms.Grayscale(num_output_channels=1), transforms.ToTensor()])
-    imageA = transform(imageA).unsqueeze(0)  # 增加批次维度
-    imageB = transform(imageB).unsqueeze(0)  # 增加批次维度
-    imageA = imageA.to(torch.device(device))
-    imageB = imageB.to(torch.device(device))
-    # print("imageA shape:", imageA.shape)  # 应该是 [1, 1, H, W]
-    # print("imageB shape:", imageB.shape)
-
-
-    # 如果图像的值在 [0, 1] 范围内，需要乘以 255 转换为 [0, 255] 范围
-    imageA *= val_range
-    imageB *= val_range
-
-    # 创建 SSIM 窗口
-    window = __create_gaussian_window(window_size).to(imageA.device)
-    # print("window shape:", window.shape)
-    
-    # 计算 SSIM
-    mu1 = F.conv2d(imageA, window, padding=window_size // 2, groups=1)
-    mu2 = F.conv2d(imageB, window, padding=window_size // 2, groups=1)
-    sigma1_sq = F.conv2d(imageA * imageA, window, padding=window_size // 2, groups=1) - mu1 * mu1
-    sigma2_sq = F.conv2d(imageB * imageB, window, padding=window_size // 2, groups=1) - mu2 * mu2
-    sigma12 = F.conv2d(imageA * imageB, window, padding=window_size // 2, groups=1) - mu1 * mu2
-    C1 = 0.01**2 * val_range**2
-    C2 = 0.03**2 * val_range**2
-    ssim_map = ((2 * mu1 * mu2 + C1) * (2 * sigma12 + C2)) / ((mu1 * mu1 + mu2 * mu2 + C1) * (sigma1_sq + sigma2_sq + C2))
-    
-    # 返回 SSIM 值
-    return ssim_map.mean() if size_average else ssim_map
 
 def __create_gaussian_window(window_size, sigma=1.5):
     # 使用高斯滤波器创建窗口
@@ -225,42 +192,6 @@ def __create_gaussian_window(window_size, sigma=1.5):
     window = window / window.sum()
     window = window.unsqueeze(0).unsqueeze(0)  # 变成 4D 形状
     return window
-
-# def __compute_similarity_matrix(population, similarity_fn, device="cuda"):
-#     """计算所有个体之间的相似度矩阵"""
-#     N = len(population)
-#     sim_matrix = np.zeros((N, N))
-#     images = [ind.render_image() for ind in population]
-
-#     def compute(i, j):
-#         sim_matrix[i, j] = sim_matrix[j, i] = similarity_fn(images[i], images[j], device)
-    
-#     # for i in range(N):
-#     #     for j in range(i+1, N):
-#     #         compute(i, j)
-
-#     Parallel(n_jobs=-1)(delayed(compute)(i, j) for i in range(N) for j in range(i+1, N))
-#     return sim_matrix
-
-def fitness_sharing_with_matrix(population, sigma=0.5, n_jobs=-1, device="cuda"):
-    # 计算相似度矩阵
-    ssim_calculator = SSIMCalculator(window_size=11, device="cuda")
-
-    # 计算相似度矩阵
-    sim_matrix = __compute_similarity_matrix(population, ssim_calculator, device=device)
-    population_size = len(population)
-
-    def compute_sharing_factor(i):
-        sharing_factor = 1 + sum(np.exp(-sim_matrix[i, j] / sigma) for j in range(population_size) if i != j)
-        return i, sharing_factor
-
-    # 并行计算 sharing_factor
-    results = Parallel(n_jobs=n_jobs)(delayed(compute_sharing_factor)(i) for i in range(population_size))
-
-    # 更新适应度
-    for i, sharing_factor in results:
-        population[i].rating /= sharing_factor
-        
 
 def concat_images(images):
     if not images:
@@ -274,77 +205,59 @@ def concat_images(images):
     new_image = Image.fromarray(stacked_image)
     return new_image
 
-def __compute_similarity_matrix(population, similarity_fn, device="cuda"):
-    """计算所有个体之间的相似度矩阵（基于 PyTorch 批量计算）"""
-    N = len(population)
-    sim_matrix = np.zeros((N, N))
-    
-    # 预加载所有图像到 GPU（避免重复加载）
-    images = [ind.render_image() for ind in population]
-    images_tensor = torch.stack([similarity_fn.preprocess(img) for img in images]).to(device)
-    
-    # 使用向量化计算所有 (i, j) 对的相似度
-    batch_size = 100  # 根据显存调整
-    for i in range(0, N, batch_size):
-        for j in range(0, N, batch_size):
-            block = similarity_fn.batch_compute_ssim(images_tensor[i:i+batch_size], images_tensor[j:j+batch_size])
-            sim_matrix[i:i+batch_size, j:j+batch_size] = block
-    
-    return sim_matrix.cpu().numpy()  # 返回 NumPy 矩阵
+# class SSIMCalculator:
+#     def __init__(self, window_size=11, device="cuda"):
+#         self.device = device
+#         self.window = self.__create_gaussian_window(window_size).to(device)
+#         self.transform = transforms.Compose([
+#             transforms.Grayscale(num_output_channels=1),
+#             transforms.ToTensor()
+#         ])
+#         self.val_range = 255.0
 
-class SSIMCalculator:
-    def __init__(self, window_size=11, device="cuda"):
-        self.device = device
-        self.window = self.__create_gaussian_window(window_size).to(device)
-        self.transform = transforms.Compose([
-            transforms.Grayscale(num_output_channels=1),
-            transforms.ToTensor()
-        ])
-        self.val_range = 255.0
+#     def preprocess(self, image):
+#         """预处理单张图像 -> [1, 1, H, W]"""
+#         tensor = self.transform(image).unsqueeze(0) * self.val_range
+#         return tensor
 
-    def preprocess(self, image):
-        """预处理单张图像 -> [1, 1, H, W]"""
-        tensor = self.transform(image).unsqueeze(0) * self.val_range
-        return tensor
+#     def batch_compute_ssim(self, images_tensor):
+#         """批量计算所有图像对的 SSIM"""
+#         # images_tensor 形状: [N, 1, H, W]
+#         N = images_tensor.shape[0]
+        
+#         # 扩展为 [N, N, 1, H, W] 以便两两比较
+#         img1 = images_tensor.unsqueeze(1).expand(-1, N, -1, -1, -1)  # [N, N, 1, H, W]
+#         img2 = images_tensor.unsqueeze(0).expand(N, -1, -1, -1, -1)  # [N, N, 1, H, W]
+        
+#         # 计算 SSIM 的批量版本
+#         mu1 = F.conv2d(img1.flatten(0, 1), self.window, padding=self.window.size(-1)//2, groups=1)
+#         mu2 = F.conv2d(img2.flatten(0, 1), self.window, padding=self.window.size(-1)//2, groups=1)
+        
+#         sigma1_sq = F.conv2d((img1 * img1).flatten(0, 1), self.window, padding=self.window.size(-1)//2, groups=1) - mu1**2
+#         sigma2_sq = F.conv2d((img2 * img2).flatten(0, 1), self.window, padding=self.window.size(-1)//2, groups=1) - mu2**2
+#         sigma12 = F.conv2d((img1 * img2).flatten(0, 1), self.window, padding=self.window.size(-1)//2, groups=1) - mu1 * mu2
+        
+#         C1 = (0.01 * self.val_range) ** 2
+#         C2 = (0.03 * self.val_range) ** 2
+        
+#         numerator = (2 * mu1 * mu2 + C1) * (2 * sigma12 + C2)
+#         denominator = (mu1**2 + mu2**2 + C1) * (sigma1_sq + sigma2_sq + C2)
+        
+#         ssim_map = numerator / (denominator + 1e-8)  # 避免除以零
+#         ssim_values = ssim_map.mean(dim=(1, 2, 3)).view(N, N)
+        
+#         # 将对角线置零（i == j 的情况）
+#         mask = torch.eye(N, dtype=torch.bool, device=self.device)
+#         ssim_values.masked_fill_(mask, 0.0)
+        
+#         return ssim_values
 
-    def batch_compute_ssim(self, images_tensor):
-        """批量计算所有图像对的 SSIM"""
-        # images_tensor 形状: [N, 1, H, W]
-        N = images_tensor.shape[0]
-        
-        # 扩展为 [N, N, 1, H, W] 以便两两比较
-        img1 = images_tensor.unsqueeze(1).expand(-1, N, -1, -1, -1)  # [N, N, 1, H, W]
-        img2 = images_tensor.unsqueeze(0).expand(N, -1, -1, -1, -1)  # [N, N, 1, H, W]
-        
-        # 计算 SSIM 的批量版本
-        mu1 = F.conv2d(img1.flatten(0, 1), self.window, padding=self.window.size(-1)//2, groups=1)
-        mu2 = F.conv2d(img2.flatten(0, 1), self.window, padding=self.window.size(-1)//2, groups=1)
-        
-        sigma1_sq = F.conv2d((img1 * img1).flatten(0, 1), self.window, padding=self.window.size(-1)//2, groups=1) - mu1**2
-        sigma2_sq = F.conv2d((img2 * img2).flatten(0, 1), self.window, padding=self.window.size(-1)//2, groups=1) - mu2**2
-        sigma12 = F.conv2d((img1 * img2).flatten(0, 1), self.window, padding=self.window.size(-1)//2, groups=1) - mu1 * mu2
-        
-        C1 = (0.01 * self.val_range) ** 2
-        C2 = (0.03 * self.val_range) ** 2
-        
-        numerator = (2 * mu1 * mu2 + C1) * (2 * sigma12 + C2)
-        denominator = (mu1**2 + mu2**2 + C1) * (sigma1_sq + sigma2_sq + C2)
-        
-        ssim_map = numerator / (denominator + 1e-8)  # 避免除以零
-        ssim_values = ssim_map.mean(dim=(1, 2, 3)).view(N, N)
-        
-        # 将对角线置零（i == j 的情况）
-        mask = torch.eye(N, dtype=torch.bool, device=self.device)
-        ssim_values.masked_fill_(mask, 0.0)
-        
-        return ssim_values
-
-    def __create_gaussian_window(self, window_size, sigma=1.5):
-        gauss = torch.Tensor([
-            np.exp(-0.5 * (x - window_size//2)**2 / sigma**2)
-            for x in range(window_size)
-        ])
-        window = gauss.unsqueeze(0) * gauss.unsqueeze(1)
-        window = window / window.sum()
-        return window.unsqueeze(0).unsqueeze(0)  # [1, 1, window_size, window_size]
+#     def __create_gaussian_window(self, window_size, sigma=1.5):
+#         gauss = torch.Tensor([
+#             np.exp(-0.5 * (x - window_size//2)**2 / sigma**2)
+#             for x in range(window_size)
+#         ])
+#         window = gauss.unsqueeze(0) * gauss.unsqueeze(1)
+#         window = window / window.sum()
+#         return window.unsqueeze(0).unsqueeze(0)  # [1, 1, window_size, window_size]
     

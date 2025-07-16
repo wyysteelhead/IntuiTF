@@ -15,7 +15,7 @@ class TFparamsImp(TFparamsBase):
     
     def __init__(self, id: int, bound: Bound = None, volume: pyrenderer.Volume = None, 
                  gradient=None, step_size=None, initial_rating=1600, W=512, H=512, 
-                 bg_color=None, device="cuda", tfparams=None, setInputs=False):
+                 bg_color=None, device="cuda", renderer_dtype_np = np.float64, tfparams=None, setInputs=False):
         """
         初始化 TFparamsImp 类
         
@@ -34,7 +34,7 @@ class TFparamsImp(TFparamsBase):
         """
         assert (bound and volume) or (tfparams), "tfparams must be initialized with bound & volume or another instance"
         # 调用父类初始化
-        super().__init__(id, bound, initial_rating, W, H, bg_color, device, tfparams)
+        super().__init__(id, bound, initial_rating, W, H, bg_color, device, renderer_dtype_np, tfparams)
         
         # 初始化渲染相关的输入设置
         if setInputs and bound is not None:
@@ -58,90 +58,6 @@ class TFparamsImp(TFparamsBase):
         """重写父类的抽象方法"""
         copy_of_self = TFparamsImp(id=self.id, tfparams=self, setInputs=True)
         return copy_of_self
-    
-    def __gen_ctf_from_gmm(self, color_mat, min_scalar_value, max_scalar_value):
-        """从高斯混合模型生成颜色传递函数"""
-        sort_color_mat = np.unique(color_mat, axis=0)  # 去重并排序
-        color_mat[0, 1:] = color_mat[1, 1:]  # 保证第一个颜色点和第二个颜色点相同
-        color_mat[-1, 1:] = color_mat[-2, 1:]  # 保证最后一个颜色点和倒数第二个颜色点相同
-        cur_color_ind = 0
-        color_map = np.zeros((self.tf_size, 4))
-        
-        for idx in range(self.tf_size):
-            interp = idx / (self.tf_size - 1)
-            scalar_val = min_scalar_value + interp * (max_scalar_value - min_scalar_value)
-            color_map[idx, 0] = scalar_val
-            
-            while cur_color_ind < len(sort_color_mat) - 2 and scalar_val > sort_color_mat[cur_color_ind+1, 0]:
-                cur_color_ind += 1
-
-            cur_color_sv = sort_color_mat[cur_color_ind, 0]
-            next_color_sv = sort_color_mat[cur_color_ind+1, 0]
-            
-            if next_color_sv == cur_color_sv:
-                scalar_val_interp = 0
-            else:
-                scalar_val_interp = (scalar_val - cur_color_sv) / (next_color_sv - cur_color_sv)
-            
-            color_map[idx, 1:] = sort_color_mat[cur_color_ind, 1:] + scalar_val_interp * \
-                (sort_color_mat[cur_color_ind + 1, 1:] - sort_color_mat[cur_color_ind, 1:])
-        
-        return color_map
-    
-    def __gen_otf_from_gmm(self, opacity_gmm, min_scalar_value, max_scalar_value):
-        """从高斯混合模型生成不透明度传递函数"""
-        opacity_map = np.zeros((self.tf_size, 2))
-        for idx in range(self.tf_size):
-            interp = float(idx)/(self.tf_size-1)
-            scalar_val = min_scalar_value+interp * \
-                (max_scalar_value-min_scalar_value)
-            gmm_sample = np.sum(opacity_gmm[:, 2] * np.exp(-np.power(
-                (scalar_val - opacity_gmm[:, 0]), 2) / np.power(opacity_gmm[:, 1], 2)))
-            gmm_sample = max(TFparamsBase.min_opacity, min(TFparamsBase.max_opacity, gmm_sample))
-            opacity_map[idx, 0] = scalar_val
-            opacity_map[idx, 1] = gmm_sample
-        return opacity_map
-    
-    def __update_x(self, opacity, color):
-        """更新颜色点的x坐标以匹配不透明度点"""
-        # 这里需要根据具体需求实现
-        return opacity, color
-        
-    def get_tf(self, color=None, opacity=None):
-        """生成传递函数张量"""
-        # 按不透明度x坐标排序高斯点
-        self.gaussians = sorted(self.gaussians, key=lambda x: x.opacity[0])
-        
-        if opacity is None:
-            for i in range(len(self.gaussians)):
-                # 堆叠不透明度
-                if i == 0:
-                    opacity = np.array([self.gaussians[i].opacity])
-                else:
-                    opacity = np.vstack([opacity, self.gaussians[i].opacity])
-                    
-        if color is None:
-            for i in range(len(self.gaussians)):
-                # 堆叠颜色
-                if i == 0:
-                    color = np.array([self.gaussians[i].color])
-                else:
-                    color = np.vstack([color, self.gaussians[i].color])
-                    
-        color = np.concatenate((opacity[:, 0:1], color), axis=1)
-                    
-        c_left = np.array([[0, self.gaussians[0].color[0], self.gaussians[0].color[1], self.gaussians[0].color[2]]], dtype=renderer_dtype_np)
-        c_right = np.array([[self.tf_size, self.gaussians[-1].color[0], self.gaussians[-1].color[1], self.gaussians[-1].color[2]]], dtype=renderer_dtype_np)
-        color = np.vstack([c_left, color, c_right])
-        opacity, color = self.__update_x(opacity, color)
-        
-        color_tf = self.__gen_ctf_from_gmm(color, 0, 255)
-        opacity_tf = self.__gen_otf_from_gmm(opacity, 0, 255)
-        ctf = color_tf[:, 1:]
-        otf = opacity_tf[:, 1:]
-        tf = np.concatenate([ctf, otf], axis=1)
-        tf = torch.from_numpy(np.array([tf], dtype=renderer_dtype_np)).to(device=self.device)
-        return tf
     
     def get_camera_matrix(self, camera=None):
         """获取相机矩阵"""

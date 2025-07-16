@@ -33,6 +33,7 @@ from genetic_optimize.utils.image_utils import combine_image, concat_images, com
 from PIL import Image, ImageDraw, ImageFont
 import numpy as np
 import ast
+from genetic_optimize.TFparamsBase import TFparamsBase
 			
 #是否生成高斯分布GIF
 Test=False
@@ -61,7 +62,8 @@ class GeneticAlgorithm:
         config_manager: ConfigManager,
         population = None, 
         iteration = 0, 
-        device="cuda"
+        device="cuda",
+        renderer_type="diffdvr"
     ):
         """
         Initialize the genetic algorithm with configuration and population.
@@ -71,13 +73,35 @@ class GeneticAlgorithm:
             population (list, optional): Initial population. If None, creates new population
             iteration (int, optional): Starting iteration number. Defaults to 0
             device (str, optional): Computing device. Defaults to "cuda"
+            renderer_type (str, optional): Type of renderer to use ('diffdvr' or 'anari'). Defaults to "diffdvr"
         """
+        # Set renderer-specific dtypes
+        self.renderer_dtype_torch, self.renderer_dtype_np = get_renderer_dtypes(renderer_type)
+        
+        # Dynamically import renderer-specific modules
+        if renderer_type == "diffdvr":
+            import torch
+            from diffdvr.settings import Settings
+            import pyrenderer
+            from genetic_optimize.TFparamsBase import TFparamsBase
+            self.TFparamsClass = TFparamsBase
+            self.Settings = Settings
+        elif renderer_type == "anari":
+            # the anari module is not ready yet, we are still working on it
+            from genetic_optimize.TFparamsAnariImp import TFparamsAnariImp
+            from anari.settings import AnariSettings
+            self.TFparamsClass = TFparamsAnariImp
+            self.Settings = AnariSettings  # Will be handled by TFparamsAnariImp
+        else:
+            raise ValueError(f"Unsupported renderer type: {renderer_type}")
+
         self.config_manager = config_manager
         self.bound = config_manager.get_bound()
         self.bg_color = config_manager.get_algorithm_config().bg_color
         self.save_path = config_manager.get_algorithm_config().save_path
         self.config = self.bound.config
         self.tf_size = self.bound.opacity_bound.x[1]
+        self.renderer_type = renderer_type  # 存储渲染器类型
         
         algorithm_config = config_manager.get_algorithm_config()
         mutation_config = config_manager.get_mutation_config()
@@ -100,15 +124,20 @@ class GeneticAlgorithm:
             style_image_copy = style_image.copy()
             self.llm_evaluator.set_middle_image(style_image_copy)
             
-        self.metric_evaluator = MetricEvaluator()
+        # self.metric_evaluator = MetricEvaluator()
         self.iteration = iteration
         self.save_interval = algorithm_config.save_interval
-        self.setting = Settings(self.bound.config_file)
+        
+        self.setting = self.Settings(self.bound.config_file)
         self.volume = self.setting.load_dataset()
-        self.gradient = self.setting.load_gradient()
-        self.volume.copy_to_gpu()
-        if self.gradient:
-            self.gradient.copy_to_gpu()
+        if self.renderer_type == "diffdvr":
+            self.gradient = self.setting.load_gradient()
+            self.volume.copy_to_gpu()
+            if self.gradient:
+                self.gradient.copy_to_gpu()
+        else:
+            self.gradient = None
+            
         self.device = device
         self.iter_bias = 0
         self.gaussian_visualizer = GaussianVisualizer()
@@ -126,16 +155,17 @@ class GeneticAlgorithm:
             SL_mutation_scale=mutation_config.SL_mutation_scale
             )
         self.population_size = algorithm_config.population_size
+        
         if population is not None:
             self.population = population
             self.population_size = len(population)
             for i in range(len(self.population)):
-                population[i].load_render_settings(bound=self.bound, volume=self.volume, gradient=self.gradient, step_size=self.setting.get_stepsize(), bg_color=self.bg_color)
+                population[i].load_render_settings(bound=self.bound, volume=self.volume, gradient=self.gradient, step_size=self.setting.get_stepsize() if self.setting else None, bg_color=self.bg_color)
         else:
-            self.population = [TFparamsImp(id=id, bound=self.bound, volume=self.volume, gradient=self.gradient, step_size=self.setting.get_stepsize(), bg_color=self.bg_color, device=self.device, setInputs=True) for id in range(self.population_size)]
+            self.population = [self.TFparamsClass(id=id, bound=self.bound, volume=self.volume, gradient=self.gradient, step_size=self.setting.get_stepsize() if self.setting else None, bg_color=self.bg_color, device=self.device, renderer_dtype_np=self.renderer_dtype_np, setInputs=True) for id in range(self.population_size)]
         
         #for backend
-        self.TF_static = (TFparamsImp.global_inputs, TFparamsImp.W, TFparamsImp.H, TFparamsImp.max_opacity, TFparamsImp.min_opacity, TFparamsImp.bg_color)
+        self.TF_static = (self.TFparamsClass.global_inputs, self.TFparamsClass.W, self.TFparamsClass.H, self.TFparamsClass.max_opacity, self.TFparamsClass.min_opacity, self.TFparamsClass.bg_color)
     
     @staticmethod
     def save_state(population, iteration, mode, filename):
@@ -148,7 +178,9 @@ class GeneticAlgorithm:
             mode (str): Current operation mode
             filename (str): Path to save the state
         """
-        pickled_population = [TFparamsImp(id=ind.id, tfparams=ind) for ind in population]
+        # Get the class of the first population member to determine which TFparams class to use
+        TFparamsClass = type(population[0])
+        pickled_population = [TFparamsClass(id=ind.id, tfparams=ind) for ind in population]
         with open(filename, 'wb') as f:
             pickle.dump({'population': pickled_population, 'iteration': iteration, 'mode': mode}, f)
 
@@ -176,13 +208,13 @@ class GeneticAlgorithm:
         """Reset the modification parameters for LLM evaluation."""
         self.llm_evaluator.reset_modification(modification)
     
-    def evaluator(self, parent1: TFparamsImp, parent2: TFparamsImp, mode, log_path = ""):
+    def evaluator(self, parent1: TFparamsBase, parent2: TFparamsBase, mode, log_path = ""):
         """
         Compare two individuals using LLM-based evaluation.
 
         Args:
-            parent1 (TFparamsImp): First individual to compare
-            parent2 (TFparamsImp): Second individual to compare
+            parent1 (TFparamsBase): First individual to compare
+            parent2 (TFparamsBase): Second individual to compare
             mode (str): Evaluation mode ('finetune', 'quality', or 'text')
             log_path (str, optional): Path to save evaluation logs. Defaults to ""
 
@@ -218,12 +250,12 @@ class GeneticAlgorithm:
             img1_base64, img2_base64 = combine_image(img1, img2)
         return winner, output, img1_base64, img2_base64
     
-    def evaluate_gaussian(self, individual: TFparamsImp, i, path):
+    def evaluate_gaussian(self, individual: TFparamsBase, i, path):
         """
         Evaluate a single Gaussian component of an individual.
 
         Args:
-            individual (TFparamsImp): Individual to evaluate
+            individual (TFparamsBase): Individual to evaluate
             i (int): Index of the Gaussian component
             path (str): Path to save evaluation results
 
@@ -237,12 +269,12 @@ class GeneticAlgorithm:
         output["gaussian"] = i
         return result, output
 
-    def fitness_evaluator(self, individual: TFparamsImp):
+    def fitness_evaluator(self, individual: TFparamsBase):
         """
         Compute fitness score for an individual using metric-based evaluation.
 
         Args:
-            individual (TFparamsImp): Individual to evaluate
+            individual (TFparamsBase): Individual to evaluate
 
         Returns:
             float: Fitness score
@@ -262,7 +294,7 @@ class GeneticAlgorithm:
             log_path (str, optional): Path to save evaluation logs. Defaults to ""
 
         Returns:
-            TFparamsImp: Winner of the tournament
+            TFparamsBase: Winner of the tournament
         """
         parent1, parent2 = random.sample(population, 2)
         return evaluator(parent1, parent2, mode, log_path)
@@ -300,7 +332,7 @@ class GeneticAlgorithm:
         Create a visualization of an individual's Gaussian distributions.
         
         Args:
-            individual (TFparamsImp): Individual to visualize
+            individual (TFparamsBase): Individual to visualize
             min_scalar (int, optional): Minimum scalar value. Defaults to 0
             max_scalar (int, optional): Maximum scalar value. Defaults to 255
             num_points (int, optional): Number of points for visualization. Defaults to 1000
@@ -325,7 +357,7 @@ class GeneticAlgorithm:
         num_lines = len(caption)
         line_height = font_size + line_padding
         img_height = num_lines * line_height + 20
-        img_width = TFparamsImp.W
+        img_width = TFparamsBase.W
 
         img = Image.new('RGB', (img_width, img_height), color='white')
         draw = ImageDraw.Draw(img)
@@ -374,12 +406,12 @@ class GeneticAlgorithm:
             task (tuple): Tuple containing (population1, population2)
 
         Returns:
-            TFparamsImp: Child individual from crossover
+            TFparamsBase: Child individual from crossover
         """
         population1, population2 = task
         parent1 = random.choice(population1)
         parent2 = random.choice(population2)
-        childs = TFparamsImp.crossover(parent1, parent2)
+        childs = TFparamsBase.crossover(parent1, parent2)
         return childs
         
     def population_crossover(self, population, count=None, num_workers=None):
@@ -439,7 +471,7 @@ class GeneticAlgorithm:
             task (tuple): Tuple containing (individual, bound, genetic_config, iter, max_iter)
 
         Returns:
-            TFparamsImp: Mutated individual
+            TFparamsBase: Mutated individual
         """
         individual, bound, genetic_config, iter, max_iter = task
         individual.mutate(bound=bound, genetic_config=genetic_config, iter=iter, maxiter=max_iter)
@@ -487,7 +519,7 @@ class GeneticAlgorithm:
             except Exception:
                 print("path don't exist, file not saved.")
                 
-    def parallel_render_population_image(self, population, num_workers=None):
+    def parallel_render_population_image(self, population, num_workers=1):
         """
         Render images for the entire population in parallel.
 
@@ -521,13 +553,13 @@ class GeneticAlgorithm:
         Generate a child individual from two parents.
 
         Args:
-            parent1 (TFparamsImp): First parent
-            parent2 (TFparamsImp): Second parent
+            parent1 (TFparamsBase): First parent
+            parent2 (TFparamsBase): Second parent
             bound (Bound): Parameter boundaries
             generations (int): Total number of generations
 
         Returns:
-            TFparamsImp: Child individual
+            TFparamsBase: Child individual
         """
         child = GeneticAlgorithm.crossover(parent1, parent2)
         child = GeneticAlgorithm.mutate(individual=child, bound=bound, iter=self.iteration, maxiter=generations)
@@ -545,7 +577,7 @@ class GeneticAlgorithm:
             log_path (str, optional): Path to save logs. Defaults to ""
 
         Returns:
-            TFparamsImp: Generated child individual
+            TFparamsBase: Generated child individual
         """
         parent1 = self.tournament_selection(population, mode, self.evaluator, log_path)
         parent2 = self.tournament_selection(population, mode, self.evaluator, log_path)
@@ -559,8 +591,8 @@ class GeneticAlgorithm:
         Perform Elo-based comparison between two individuals.
 
         Args:
-            p1 (TFparamsImp): First individual
-            p2 (TFparamsImp): Second individual
+            p1 (TFparamsBase): First individual
+            p2 (TFparamsBase): Second individual
             mode (str): Evaluation mode
             save_path (str): Path to save results
 
@@ -580,7 +612,7 @@ class GeneticAlgorithm:
         Check if a Gaussian component should be frozen.
 
         Args:
-            individual (TFparamsImp): Individual to check
+            individual (TFparamsBase): Individual to check
             i (int): Index of Gaussian component
             save_path (str): Path to save results
 
@@ -741,12 +773,12 @@ class GeneticAlgorithm:
         self.par_population_freeze(population=population, save_path=save_path, num_workers=num_workers)
         self.save_activate_gasussian_images(population=population, save_path=os.path.join(self.save_path, "population_state_freezed" + str(self.iteration) + ".png"))
         
-    def calculate_dynamic_fitness(self, population: List[TFparamsImp], current_gen, max_gen, min_pressure=1.2, max_pressure=4.0, k=2.0):
+    def calculate_dynamic_fitness(self, population: List[TFparamsBase], current_gen, max_gen, min_pressure=1.2, max_pressure=4.0, k=2.0):
         """
         Calculate dynamic fitness values for the population based on current generation.
 
         Args:
-            population (List[TFparamsImp]): Population to calculate fitness for
+            population (List[TFparamsBase]): Population to calculate fitness for
             current_gen (int): Current generation number
             max_gen (int): Maximum number of generations
             min_pressure (float, optional): Minimum selection pressure. Defaults to 1.2
@@ -1128,12 +1160,12 @@ def parse_args(mode="train"):
     parser.add_argument('--model_name', type=str, default="gpt-4o", help="Model name for the API.")
     parser.add_argument('--new_save_path', action='store_true', help="Whether to create a new save path.")
     parser.add_argument('--style_image', type=str, default=None, help="The styling image path.")
+    parser.add_argument('--renderer', type=str, default="diffdvr", choices=["diffdvr", "anari"], help="Renderer to use (diffdvr or anari)")  # 添加渲染器选择参数
     if mode == "backend":
         parser.add_argument('--port', type=int, default=6006, help='服务器起始端口号 (默认: 6006)')
         parser.add_argument('--max_attempts', type=int, default=10, help='尝试查找可用端口的最大次数 (默认: 10)')
     
-    # 解析命令行参数1
-    args = parser.parse_args()
+    # 解析命令行参数
     args = parser.parse_args()
     args.cam_mutation_rate = parse_range(args.cam_mutation_rate)
     args.cam_mutation_scale = parse_range(args.cam_mutation_scale)
@@ -1177,11 +1209,14 @@ if __name__ == "__main__":
         population, iteration, mode = None, 0, []
         
     print("current iteration: ", iteration)
+    print(f"Using renderer: {args.renderer}")  # 添加渲染器信息输出
     
     genetic_algorithm = GeneticAlgorithm(
         config_manager=config_manager,
         population=population,
-        iteration=iteration
+        iteration=iteration,
+        device=args.device,
+        renderer_type=args.renderer  # 传入渲染器类型
     )
     
     # Run genetic algorithm

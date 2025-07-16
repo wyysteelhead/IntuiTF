@@ -29,7 +29,7 @@
         "zoomValue": 4.0
     },
     "dataset": {
-        "file": "/root/autodl-tmp/GeneticDVR/volumes/csafe_heptane_302x302x302_uint8.cvol",
+        "file": "./volumes/csafe_heptane_302x302x302_uint8.cvol",
         "mipmap": 0,
         "syntheticDataset": -1,
         "syntheticDatasetResolutionPower": 6,

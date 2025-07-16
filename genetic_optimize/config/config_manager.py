@@ -9,7 +9,7 @@ class AlgorithmConfig:
     population_size: int = 50
     generations: int = 10
     save_interval: int = 5
-    text_interval: int = 10
+    intent_interval: int = 10
     device: str = "cuda"
     bg_color: Tuple[int, int, int] = (0, 0, 0)
     model_name: str = "gpt-4o"
