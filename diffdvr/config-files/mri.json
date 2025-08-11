@@ -34,7 +34,7 @@
         "zoomValue": 4.0
     },
     "dataset": {
-        "file": "/folderFromHost/visualization_dataset/transfer_result/Head MRI CISS_256x256x124_uint8.cvol",
+        "cvol_file": "/folderFromHost/visualization_dataset/transfer_result/Head MRI CISS_256x256x124_uint8.cvol",
         "mipmap": 0,
         "syntheticDataset": -1,
         "syntheticDatasetResolutionPower": 6,

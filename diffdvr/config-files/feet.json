@@ -29,7 +29,7 @@
         "zoomValue": 4.0
     },
     "dataset": {
-        "file": "./volumes/feet_256x256x256_Right.cvol",
+        "cvol_file": "./volumes/feet_256x256x256_Right.cvol",
         "mipmap": 0,
         "syntheticDataset": -1,
         "syntheticDatasetResolutionPower": 6,

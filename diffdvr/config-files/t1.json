@@ -34,7 +34,7 @@
         "zoomValue": 4.0
     },
     "dataset": {
-        "file": "/folderFromHost/visualization_dataset/transfer_result/t1_256x224x176_ushort.cvol",
+        "cvol_file": "/folderFromHost/visualization_dataset/transfer_result/t1_256x224x176_ushort.cvol",
         "mipmap": 0,
         "syntheticDataset": -1,
         "syntheticDatasetResolutionPower": 6,

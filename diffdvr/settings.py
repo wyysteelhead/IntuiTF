@@ -17,6 +17,7 @@ from diffdvr.utils import make_real3
 from genetic_optimize.utils.dtype_utils import get_renderer_dtypes
 renderer_dtype_torch, renderer_dtype_np = get_renderer_dtypes("diffdvr")
 import pyrenderer
+from genetic_optimize.utils.file_utils import get_project_root
 
 """
 Loads settings from .json file exported by the GUI
@@ -25,7 +26,7 @@ Loads settings from .json file exported by the GUI
 class Settings:
 
     def __init__(self, file):
-        self._filepath = os.path.split(file)[0]
+        self._filepath = get_project_root()
         with open(file) as fb:
             self._data = json.load(fb)
         if self._data["version"] != 2:

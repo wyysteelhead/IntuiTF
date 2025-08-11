@@ -98,8 +98,8 @@ class GeneticAlgorithm:
             import torch
             from diffdvr.settings import Settings
             import pyrenderer
-            from genetic_optimize.TFparamsBase import TFparamsBase
-            self.TFparamsClass = TFparamsBase
+            from genetic_optimize.TFparamsImp import TFparamsImp
+            self.TFparamsClass = TFparamsImp
             self.Settings = Settings
         elif renderer_type == "anari":
             # the anari module is not ready yet, we are still working on it

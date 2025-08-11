@@ -34,7 +34,7 @@
         "zoomValue": 4.0
     },
     "dataset": {
-        "file": "./volumes/tacc_turbulence_256x256x256_float32.cvol",
+        "cvol_file": "./volumes/tacc_turbulence_256x256x256_float32.cvol",
         "mipmap": 0,
         "syntheticDataset": -1,
         "syntheticDatasetResolutionPower": 6,

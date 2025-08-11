@@ -29,7 +29,7 @@
         "zoomValue": 4.0
     },
     "dataset": {
-        "file": "/folderFromHost/visualization_dataset/transfer_result/carp_256x256x512_uint16.cvol",
+        "cvol_file": "/folderFromHost/visualization_dataset/transfer_result/carp_256x256x512_uint16.cvol",
         "mipmap": 0,
         "syntheticDataset": -1,
         "syntheticDatasetResolutionPower": 6,

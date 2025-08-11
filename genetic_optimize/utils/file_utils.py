@@ -83,3 +83,18 @@ def load_instruct(instruct_path, instruct_number=None):
                 return instr.get("content")
         raise ValueError(f"Instruction with name '{instruct_number}' not found.")
     
+def get_project_root():
+    """返回项目根目录（假设此代码在 `project_root/src/` 或类似子目录中）"""
+    current_dir = os.path.dirname(os.path.abspath(__file__))  # 当前脚本的绝对路径
+    # 向上查找，直到找到项目根目录（例如包含 `.git`、`requirements.txt` 或 `volumes/` 的目录）
+    while True:
+        if (
+            os.path.exists(os.path.join(current_dir, "volumes"))  # 检查是否存在 volumes 目录
+            or os.path.exists(os.path.join(current_dir, ".git"))  # 或者检查 Git 根目录
+            or os.path.exists(os.path.join(current_dir, "README.md"))  # 或者其他项目根标志
+        ):
+            return current_dir
+        parent_dir = os.path.dirname(current_dir)
+        if parent_dir == current_dir:  # 已经到达文件系统根目录
+            raise FileNotFoundError("Could not find project root directory!")
+        current_dir = parent_dir

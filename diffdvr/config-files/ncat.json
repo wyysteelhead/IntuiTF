@@ -29,7 +29,7 @@
         "zoomValue": 4.0
     },
     "dataset": {
-        "file": "./volumes/ncat_phantom_256x256x256_invert.cvol",
+        "cvol_file": "./volumes/ncat_phantom_256x256x256_invert.cvol",
         "mipmap": 0,
         "syntheticDataset": -1,
         "syntheticDatasetResolutionPower": 6,
