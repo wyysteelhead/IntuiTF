@@ -5,7 +5,7 @@ import random
 
 def load_config(config_path):
     """
-    从本地 JSON 文件中加载配置，包括 API 密钥。
+    Load configuration from local JSON file, including API keys.
     """
     with open(config_path, "r") as config_file:
         config = json.load(config_file)
@@ -14,7 +14,7 @@ def load_config(config_path):
 
 def load_prompt(prompt_path):
     """
-    从外部 TXT 文件中加载提示文本。
+    Load prompt text from external TXT file.
     """
     assert os.path.isfile(prompt_path)
     with open(prompt_path, "r", encoding="utf-8") as prompt_file:
@@ -47,20 +47,20 @@ def load_prompt_with_instruct(instruct_path, instruct_number, prompt_path):
 
 def load_instruct(instruct_path, instruct_number=None):
     """
-    从 JSON 文件中加载指令。
+    Load instructions from JSON file.
     
-    参数:
-        instruct_path (str): JSON 文件路径。
-        instruct_number (int, optional): 指定加载的指令编号。如果为 None，则随机选择一条指令。
+    Parameters:
+        instruct_path (str): JSON file path.
+        instruct_number (int, optional): Specified instruction number to load. If None, randomly select an instruction.
     
-    返回:
-        dict: 包含指令名称和内容的字典。例如：{"name": "instruct1", "content": "..."}
+    Returns:
+        dict: Dictionary containing instruction name and content. Example: {"name": "instruct1", "content": "..."}
     """
-    # 加载 JSON 文件
+    # Load JSON file
     with open(instruct_path, 'r') as f:
         data = json.load(f)
     
-    # 获取指令列表
+    # Get instruction list
     instructions = data.get("instructions", [])
     
     if not instructions:
@@ -69,14 +69,14 @@ def load_instruct(instruct_path, instruct_number=None):
     if instruct_number is None:
         return None
     
-    # 如果 instruct_number 是数字字符串，转换为整数并作为索引使用
+    # If instruct_number is a numeric string, convert to integer and use as index
     if instruct_number.isdigit():
         index = int(instruct_number)
         if index < 0 or index >= len(instructions):
             raise ValueError(f"Invalid instruct_number: {index}. Must be between 0 and {len(instructions) - 1}.")
         return instructions[index].get("content")
     
-    # 如果 instruct_number 是非数字字符串，根据 name 检索指令
+    # If instruct_number is a non-numeric string, retrieve instruction by name
     else:
         for instr in instructions:
             if instr.get("name") == instruct_number:
@@ -84,17 +84,17 @@ def load_instruct(instruct_path, instruct_number=None):
         raise ValueError(f"Instruction with name '{instruct_number}' not found.")
     
 def get_project_root():
-    """返回项目根目录（假设此代码在 `project_root/src/` 或类似子目录中）"""
-    current_dir = os.path.dirname(os.path.abspath(__file__))  # 当前脚本的绝对路径
-    # 向上查找，直到找到项目根目录（例如包含 `.git`、`requirements.txt` 或 `volumes/` 的目录）
+    """Return project root directory (assuming this code is in `project_root/src/` or similar subdirectory)"""
+    current_dir = os.path.dirname(os.path.abspath(__file__))  # Absolute path of current script
+    # Search upward until finding project root directory (e.g., directory containing `.git`, `requirements.txt` or `volumes/`)
     while True:
         if (
-            os.path.exists(os.path.join(current_dir, "volumes"))  # 检查是否存在 volumes 目录
-            or os.path.exists(os.path.join(current_dir, ".git"))  # 或者检查 Git 根目录
-            or os.path.exists(os.path.join(current_dir, "README.md"))  # 或者其他项目根标志
+            os.path.exists(os.path.join(current_dir, "volumes"))  # Check if volumes directory exists
+            or os.path.exists(os.path.join(current_dir, ".git"))  # Or check Git root directory
+            or os.path.exists(os.path.join(current_dir, "README.md"))  # Or other project root markers
         ):
             return current_dir
         parent_dir = os.path.dirname(current_dir)
-        if parent_dir == current_dir:  # 已经到达文件系统根目录
+        if parent_dir == current_dir:  # Already reached filesystem root directory
             raise FileNotFoundError("Could not find project root directory!")
         current_dir = parent_dir

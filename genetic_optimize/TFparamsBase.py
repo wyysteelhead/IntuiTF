@@ -55,12 +55,12 @@ class TFparamsBase:
         self.device = device
         self.id = id
         self.rating = self.initial_rating
-        self.matches = set()  # 记录对战过的对手ID
+        self.matches = set()  # Record IDs of opponents battled against
         TFparamsBase.max_opacity = max(TFparamsBase.max_opacity, bound.opacity_bound.y[1])
         TFparamsBase.min_opacity = min(TFparamsBase.min_opacity, bound.opacity_bound.y[0])
             
     def __initialize_from_tfparams(self, tfparams):
-        """根据已有的 tfparams 初始化，创建独立的数据副本"""
+        """Initialize from existing tfparams, creating independent data copies"""
         self.gmm_num = tfparams.gmm_num
         self.camera = tuple(tfparams.camera)  # Create a new tuple
         self.opacity = np.copy(tfparams.opacity)  # Create a deep copy of numpy arrays
@@ -76,7 +76,7 @@ class TFparamsBase:
     
     def to_json(self):
         """
-        将 TFparams 对象转换为 JSON 可序列化的字典。
+        Convert TFparams object to JSON serializable dictionary.
         """
         return {
             'id': self.id,
@@ -113,7 +113,7 @@ class TFparamsBase:
         self.image = None if tfparamsbase.image is None else tfparamsbase.image.copy()  # Create a copy of the image if it exists
         self.img_str = None if tfparamsbase.img_str is None else tfparamsbase.img_str  # Create a copy of the image string if it exists
         self.rating = tfparamsbase.rating
-        self.matches = tfparamsbase.matches  # 记录对战过的对手ID
+        self.matches = tfparamsbase.matches  # Record IDs of opponents battled against
         
     def random_color(self, bound: Bound):
         self.image = None
@@ -136,49 +136,49 @@ class TFparamsBase:
             
     def update_camera_rotation(self, direction):
         """
-        根据鼠标/触控拖拽更新相机旋转角度
+        Update camera rotation angle based on mouse/touch drag
         
         Args:
-            direction (dict): 包含 deltaX 和 deltaY 的字典，表示拖拽偏移量
+            direction (dict): Dictionary containing deltaX and deltaY representing drag offset
         """
-        # 提取拖拽偏移量
+        # Extract drag offset
         delta_x = direction.get('deltaX', 0)
         delta_y = direction.get('deltaY', 0)
         
-        # 定义旋转灵敏度系数（可以根据需求调整）
+        # Define rotation sensitivity coefficient (adjustable as needed)
         sensitivity = 0.5
         
-        # 当前相机参数
+        # Current camera parameters
         pitch, yaw, distance, center, fov = self.camera
         
-        # 根据水平拖拽更新偏航角（yaw）- 水平拖拽影响左右旋转
-        # 负号是因为向右拖动（正deltaX）应该减少yaw（相机向左转）
+        # Update yaw angle based on horizontal drag - horizontal drag affects left-right rotation
+        # Negative sign because dragging right (positive deltaX) should decrease yaw (camera turns left)
         yaw = (yaw - delta_x * sensitivity) % 360
         
-        # 根据垂直拖拽更新俯仰角（pitch）- 垂直拖拽影响上下俯仰
-        # 负号是因为向下拖动（正deltaY）应该减少pitch（相机向上看）
+        # Update pitch angle based on vertical drag - vertical drag affects up-down pitch
+        # Negative sign because dragging down (positive deltaY) should decrease pitch (camera looks up)
         pitch += delta_y * sensitivity
         
-        # 限制pitch范围，防止过度旋转（通常在-90到90度之间）
+        # Limit pitch range to prevent excessive rotation (usually between -90 and 90 degrees)
         pitch = max(-85, min(85, pitch))
         
-        # 更新相机参数
+        # Update camera parameters
         self.camera = (pitch, yaw, distance, center, fov)
         self.image = None
         self.img_str = None
 
     def update_camera_zoom(self, zoom_factor=0.1):
         """
-        根据缩放因子更新相机的缩放级别
+        Update camera zoom level based on zoom factor
         
         Args:
-            zoom_factor (float): 缩放因子，正值表示放大，负值表示缩小
+            zoom_factor (float): Zoom factor, positive value for zoom in, negative value for zoom out
         """
-        # 当前相机参数
+        # Current camera parameters
         pitch, yaw, distance, center, fov = self.camera
-        # 更新距离
+        # Update distance
         distance *= (1 - zoom_factor)
-        # 更新相机参数
+        # Update camera parameters
         self.camera = (pitch, yaw, distance, center, fov)
         self.image = None
         self.img_str = None
@@ -213,7 +213,7 @@ class TFparamsBase:
     def __gen_color(self, bound: Bound, num=None):
         if num == None: 
             num = self.gmm_num
-        #对于每个高斯峰坐标，随机颜色
+        # Random color for each Gaussian peak coordinate
         random_color = self.__gen_hsl(bound, num)
         return random_color
     
@@ -251,11 +251,11 @@ class TFparamsBase:
         child2.parent_id = [TF1.id, TF2.id]
         
         def __cross_camera(rate=0.5):
-            # 提取 camera 参数
+            # Extract camera parameters
             pitch1, yaw1, distance1, center1, fov1 = TF1.camera
             pitch2, yaw2, distance2, center2, fov2 = TF2.camera
 
-            # 创建两个子代，分别进行交叉
+            # Create two offspring for crossover
             child1_pitch = pitch1 if random.random() > rate else pitch2
             child1_yaw = yaw1 if random.random() > rate else yaw2
             child1_distance = distance1 if random.random() > rate else distance2
@@ -275,25 +275,25 @@ class TFparamsBase:
             child1_opacity = []
             child2_opacity = []
 
-            # 对每个点的参数进行交叉操作
-            for i in range(TF1.opacity.shape[0]):  # 遍历每个样本点
+            # Perform crossover on parameters of each point
+            for i in range(TF1.opacity.shape[0]):  # Iterate through each sample point
                 child1_point = []
                 child2_point = []
-                # 按照 rate 决定是否整行交换
+                # Decide whether to swap entire row based on rate
                 if random.random() < rate:
-                    # 整行交换
+                    # Swap entire row
                     child1_point = list(TF2.opacity[i])
                     child2_point = list(TF1.opacity[i])
                 else:
-                    # 保持原样
+                    # Keep original
                     child1_point = list(TF1.opacity[i])
                     child2_point = list(TF2.opacity[i])
 
-                # 将交叉后的结果存入子代
+                # Store crossover results in offspring
                 child1_opacity.append(child1_point)
                 child2_opacity.append(child2_point)
 
-            # 将交叉后的列表转换为 numpy 数组
+            # Convert crossover list to numpy array
             child1.opacity = np.array(child1_opacity)
             child2.opacity = np.array(child2_opacity)
 
@@ -305,8 +305,8 @@ class TFparamsBase:
             child1_color = []
             child2_color = []
 
-            # 对每个点的参数进行交叉操作
-            for i in range(TF1.color.shape[0]):  # 遍历每个样本点
+            # Perform crossover on parameters of each point
+            for i in range(TF1.color.shape[0]):  # Iterate through each sample point
                 child1_point = [TF1.color[i, 0]]
                 child2_point = [TF2.color[i, 0]]
                 # For first and last points, keep the original color
@@ -326,19 +326,19 @@ class TFparamsBase:
                         child1_point.append(TF1.color[i, j])
                         child2_point.append(TF2.color[i, j])
 
-                # 将交叉后的结果存入子代
+                # Store crossover results in offspring
                 child1_color.append(child1_point)
                 child2_color.append(child2_point)
 
-            # 将交叉后的列表转换为 numpy 数组
+            # Convert crossover list to numpy array
             child1.color = np.array(child1_color)
             child2.color = np.array(child2_color)
             
         def __cross_all_old(rate=0.5):
-            # 对每个点的参数进行交叉操作
+            # Perform crossover on parameters of each point
             i1 = 0
             i2 = 0
-            while((i1 < TF1.gmm_num and i2 < TF2.gmm_num)):  # 遍历每个样本点
+            while((i1 < TF1.gmm_num and i2 < TF2.gmm_num)):  # Iterate through each sample point
                 while (i1 < TF1.gmm_num and TF1.gaussians[i1].is_frozen()):
                     i1 += 1
                 while (i2 < TF2.gmm_num and TF2.gaussians[i2].is_frozen()):
@@ -348,9 +348,9 @@ class TFparamsBase:
                 if i1 >= TF1.gmm_num or i2 >= TF2.gmm_num:
                     break
                     
-                # 按照 rate 决定是否整行交换
+                # Decide whether to swap entire row based on rate
                 if random.random() < rate:
-                    # 整行交换
+                    # Swap entire row
                     child1.gaussians[i1] = TF2.gaussians[i2].copy()
                     child2.gaussians[i2] = TF1.gaussians[i1].copy()
                 i1 += 1
@@ -358,25 +358,25 @@ class TFparamsBase:
                 
         def __cross_all(rate=0.6):
             """
-            增强版的高斯参数交叉操作，支持属性级别的精细交叉
+            Enhanced Gaussian parameter crossover operation with fine-grained attribute-level crossover
             
             Args:
-                rate (float): 进行交叉的基础概率
+                rate (float): Base probability for performing crossover
             """
-            # 对每个点的参数进行交叉操作
+            # Perform crossover on parameters of each point
             i1 = 0
             i2 = 0
-            while((i1 < TF1.gmm_num and i2 < TF2.gmm_num)):  # 遍历每个样本点
+            while((i1 < TF1.gmm_num and i2 < TF2.gmm_num)):  # Iterate through each sample point
                 while (i1 < TF1.gmm_num and TF1.gaussians[i1].is_frozen()):
                     i1 += 1
                 while (i2 < TF2.gmm_num and TF2.gaussians[i2].is_frozen()):
                     i2 += 1
                 
-                # 检查索引是否仍在有效范围内
+                # Check if indices are still within valid range
                 if i1 >= TF1.gmm_num or i2 >= TF2.gmm_num:
                     break
                     
-                # 针对每个参数单独决定是否交换
+                # Decide whether to swap each parameter individually
                 cross_decision = {
                     'x': random.random() < rate,
                     'bandwidth': random.random() < rate,
@@ -384,34 +384,34 @@ class TFparamsBase:
                     'color': random.random() < rate
                 }
                 
-                # 根据交叉决策执行交换操作
+                # Execute swap operations based on crossover decisions
                 if cross_decision['x']:
-                    # 交换 x 坐标
+                    # Swap x coordinate
                     temp_x = child1.gaussians[i1].opacity[0]
                     child1.gaussians[i1].opacity[0] = child2.gaussians[i2].opacity[0]
                     child2.gaussians[i2].opacity[0] = temp_x
                     
                 if cross_decision['bandwidth']:
-                    # 交换带宽
+                    # Swap bandwidth
                     temp_bandwidth = child1.gaussians[i1].opacity[1]
                     child1.gaussians[i1].opacity[1] = child2.gaussians[i2].opacity[1]
                     child2.gaussians[i2].opacity[1] = temp_bandwidth
                     
                 if cross_decision['y']:
-                    # 交换不透明度高度
+                    # Swap opacity height
                     temp_y = child1.gaussians[i1].opacity[2]
                     child1.gaussians[i1].opacity[2] = child2.gaussians[i2].opacity[2]
                     child2.gaussians[i2].opacity[2] = temp_y
                     
                 if cross_decision['color']:
-                    # 交换整个颜色
+                    # Swap entire color
                     temp_color = np.copy(child1.gaussians[i1].color)
                     child1.gaussians[i1].color = np.copy(child2.gaussians[i2].color)
                     child2.gaussians[i2].color = temp_color
                     
-                # 如果没有任何参数进行交换，则有一定概率强制交换一个随机参数
+                # If no parameters are swapped, force swap a random parameter with certain probability
                 if not any(cross_decision.values()) and random.random() < 0.5:
-                    # 随机选择一个参数进行交换
+                    # Randomly select a parameter to swap
                     param = random.choice(['x', 'bandwidth', 'y', 'color'])
                     if param == 'x':
                         temp_x = child1.gaussians[i1].opacity[0]
@@ -457,8 +457,8 @@ class TFparamsBase:
         
         # 1. Mutate camera parameters
         def __mutate_camera():
-            # 计算变异尺度
-            # 判断 mutation_scale 是否为单一数值或范围元组
+            # Calculate mutation scale
+            # Determine if mutation_scale is a single value or range tuple
             camera_bound = bound.camera_bound
             scale_factor = GeneticConfig.get_mutation_factor(mutation_factor=genetic_config.cam_mutation_scale, iter=iter, maxiter=maxiter)
             rate_factor = GeneticConfig.get_mutation_factor(mutation_factor=genetic_config.cam_mutation_rate, iter=iter, maxiter=maxiter)
@@ -503,30 +503,30 @@ class TFparamsBase:
             rate_factor = GeneticConfig.get_mutation_factor(mutation_factor=genetic_config.color_mutation_rate, iter=iter, maxiter=maxiter)
             
             if random.random() > 0.7:
-                # 随机交换两个颜色，而不是打乱所有颜色
+                # Randomly swap two colors instead of shuffling all colors
                 unfrozen_indices = [i for i in range(len(self.gaussians)) if not self.gaussians[i].is_frozen()]
                 
-                # 只有当有至少两个未冻结的高斯时才执行交换
+                # Only perform swap when there are at least two unfrozen Gaussians
                 if len(unfrozen_indices) >= 2:
-                    # 随机选择两个不同的索引
+                    # Randomly select two different indices
                     idx1, idx2 = random.sample(unfrozen_indices, 2)
                     
-                    # 交换这两个高斯的颜色
+                    # Swap colors of these two Gaussians
                     temp_color = np.copy(self.gaussians[idx1].color)
                     self.gaussians[idx1].color = np.copy(self.gaussians[idx2].color)
                     self.gaussians[idx2].color = temp_color
             else:
-            # 跳过第一个和最后一个颜色点
+            # Skip first and last color points
                 for i in range(len(self.gaussians)):
                         if self.gaussians[i].is_frozen():
                             continue
-                    # 只有当随机概率小于变异率时才进行变异
-                        # 从RGB转换到HLS颜色空间
+                    # Only mutate when random probability is less than mutation rate
+                        # Convert from RGB to HLS color space
                         hues, lightnesses, saturations = colorsys.rgb_to_hls(self.gaussians[i].color[0], self.gaussians[i].color[1], self.gaussians[i].color[2])
                         
-                        # 随机选择一个通道进行变异 (0=hue, 1=saturation, 2=lightness)
+                        # Randomly select a channel for mutation (0=hue, 1=saturation, 2=lightness)
                         # channel = random.randint(0, 2)
-                        # if channel == 0:  # 变异色相(hue)
+                        # if channel == 0:  # Mutate hue
                         if random.random() < rate_factor:
                             if directions is not None and directions.color.hues is not None:
                                 hues = directions.color.hues
@@ -569,13 +569,13 @@ class TFparamsBase:
         pass
         
     def get_tf(self, color=None, opacity=None):
-        """生成传递函数张量"""
-        # 按不透明度x坐标排序高斯点
+        """Generate transfer function tensor"""
+        # Sort Gaussian points by opacity x-coordinate
         self.gaussians = sorted(self.gaussians, key=lambda x: x.opacity[0])
         
         if opacity is None:
             for i in range(len(self.gaussians)):
-                # 堆叠不透明度
+                # Stack opacity
                 if i == 0:
                     opacity = np.array([self.gaussians[i].opacity])
                 else:
@@ -583,7 +583,7 @@ class TFparamsBase:
                     
         if color is None:
             for i in range(len(self.gaussians)):
-                # 堆叠颜色
+                # Stack color
                 if i == 0:
                     color = np.array([self.gaussians[i].color])
                 else:
@@ -652,8 +652,8 @@ class TFparamsBase:
             
             back_image_gray = apply_semi_transparent_background(
                 image=back_image_gray, 
-                opacity=0.1,  # 可以调整半透明程度
-                bg_color=self.bg_color  # 默认白色背景
+                opacity=0.1,  # Can adjust semi-transparency level
+                bg_color=self.bg_color  # Default white background
             )
             
             back_image_gray.paste(image, (0, 0), image.split()[3] if image.mode == 'RGBA' else None)
@@ -668,11 +668,11 @@ class TFparamsBase:
     
     def render_single_gaussian(self, gaussian_index, device="cuda", bg_color=None, set_to_red=False):
         gaussians = []
-        # 复制高斯列表以避免修改原始数据
+        # Copy Gaussian list to avoid modifying original data
         for i in range(len(self.gaussians)):
             gaussians.append(self.gaussians[i].copy())
         
-        # 将所有高斯的不透明度设为0
+        # Set all Gaussian opacities to 0
         for i in range(len(gaussians)):
             gaussians[i].opacity[2] = 0
             if set_to_red:
@@ -682,7 +682,7 @@ class TFparamsBase:
         # 只设置目标高斯的不透明度为原始值
         gaussians[gaussian_index].opacity[2] = self.gaussians[gaussian_index].opacity[2]
         
-        # 收集所有高斯的不透明度
+        # Collect all Gaussian opacities
         opacity = None
         for i in range(len(gaussians)):
             if i == 0:
@@ -690,7 +690,7 @@ class TFparamsBase:
             else:
                 opacity = np.vstack([opacity, gaussians[i].opacity])
         
-        # 收集所有高斯的颜色
+        # Collect all Gaussian colors
         color = None
         for i in range(len(gaussians)):
             if i == 0:
@@ -698,7 +698,7 @@ class TFparamsBase:
             else:
                 color = np.vstack([color, gaussians[i].color])
                 
-        # 生成传递函数并渲染图像
+        # Generate transfer function and render image
         tf = self.get_tf(color, opacity)
         image = self.render_image(device, bg_color, force_render=True, 
                                  setImage=False, addRedBorder=False, tf=tf, transparent=True)
@@ -723,10 +723,10 @@ class TFparamsBase:
         return outline_img
     
     def outline_active_gaussians(self, device="cuda", bg_color=None, set_to_red=False):
-        # 复制高斯列表以避免修改原始数据
+        # Copy Gaussian list to avoid modifying original data
         gaussians = [self.gaussians[i].copy() for i in range(len(self.gaussians))]
         
-        # 将所有高斯的不透明度设为0
+        # Set all Gaussian opacities to 0
         for i in range(len(gaussians)):
             if set_to_red:
                 # turn rgb into red
@@ -736,10 +736,10 @@ class TFparamsBase:
         for i in range(self.gmm_num):
             if gaussians[i].is_frozen():
                 continue
-            # 只设置目标高斯的不透明度为原始值
+            # Only set target Gaussian opacity to original value
             gaussians[i].opacity[2] = self.gaussians[i].opacity[2]
         
-        # 收集所有高斯的不透明度
+        # Collect all Gaussian opacities
         opacity = None
         for i in range(len(gaussians)):
             if i == 0:
@@ -747,7 +747,7 @@ class TFparamsBase:
             else:
                 opacity = np.vstack([opacity, gaussians[i].opacity])
         
-        # 收集所有高斯的颜色
+        # Collect all Gaussian colors
         color = None
         for i in range(len(gaussians)):
             if i == 0:
@@ -755,7 +755,7 @@ class TFparamsBase:
             else:
                 color = np.vstack([color, gaussians[i].color])
                 
-        # 生成传递函数并渲染图像
+        # Generate transfer function and render image
         tf = self.get_tf(color, opacity)
         image = self.render_image(device, bg_color, force_render=True, 
                                 setImage=False, addRedBorder=False, tf=tf, transparent=True)
@@ -763,7 +763,7 @@ class TFparamsBase:
         back_image = self.render_image(device)
         # Convert background to grayscale
         back_image_gray = back_image.convert('L').convert('RGB')
-        # 然后降低亮度，使背景更暗
+        # Then reduce brightness to make background darker
         
         back_image_gray = apply_semi_transparent_background(
             image=back_image_gray, 
@@ -782,78 +782,78 @@ class TFparamsBase:
     
     def plot_tf_tensor(self):
         """
-        将传递函数张量可视化并返回为PIL Image
+        Visualize transfer function tensor and return as PIL Image
         
-        返回:
-            PIL.Image: 包含传递函数可视化的PIL图像对象
+        Returns:
+            PIL.Image: PIL image object containing transfer function visualization
         """
         
-        # 将tf转换为numpy数组以便处理
+        # Convert tf to numpy array for processing
         tf = self.get_tf()
-        tf_np = tf.cpu().numpy()[0]  # 去掉batch维度
+        tf_np = tf.cpu().numpy()[0]  # Remove batch dimension
         
-        # 提取颜色和不透明度
-        ctf = tf_np[:, 0:3]  # RGB颜色部分
-        otf = tf_np[:, 3]    # 不透明度部分
+        # Extract color and opacity
+        ctf = tf_np[:, 0:3]  # RGB color part
+        otf = tf_np[:, 3]    # Opacity part
         
-        # 创建x轴数据 (标量值)
+        # Create x-axis data (scalar values)
         scalar_values = np.linspace(0, 255, len(tf_np))
-        # 创建绘图
+        # Create plot
         fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(TFparamsBase.W/100, TFparamsBase.H/100))
 
-        # 绘制颜色映射
+        # Draw color mapping
         cmap = np.zeros((1, len(scalar_values), 3))
         for i in range(len(scalar_values)):
             cmap[0, i] = ctf[i]
 
         ax1.imshow(cmap, aspect='auto', extent=[0, 255, 0, 1])
-        ax1.set_title('传递函数：颜色映射')
-        ax1.set_xlabel('标量值')
-        ax1.set_yticks([])  # 隐藏Y轴刻度
+        ax1.set_title('Transfer Function: Color Mapping')
+        ax1.set_xlabel('Scalar Value')
+        ax1.set_yticks([])  # Hide Y-axis ticks
 
-        # 绘制不透明度曲线
+        # Draw opacity curve
         ax2.plot(scalar_values, otf, 'b-', linewidth=2)
         ax2.set_xlim(0, 255)
         ax2.set_ylim(0, max(1.1, otf.max()))
-        ax2.set_title('传递函数：不透明度映射')
-        ax2.set_xlabel('标量值')
-        ax2.set_ylabel('不透明度')
+        ax2.set_title('Transfer Function: Opacity Mapping')
+        ax2.set_xlabel('Scalar Value')
+        ax2.set_ylabel('Opacity')
 
-        # 调整布局
+        # Adjust layout
         plt.tight_layout()
 
-        # 将图形转换为PIL Image
+        # Convert figure to PIL Image
         buf = io.BytesIO()
         fig.savefig(buf, format='png')
         buf.seek(0)
         img = Image.open(buf)
-        plt.close(fig)  # 关闭图形以释放内存
+        plt.close(fig)  # Close figure to release memory
         
         return img
 
     def create_rotation_video(self, fps=30, duration=5, resolution=(512, 512)):
         """
-        创建旋转视频，可以输出到文件或内存缓冲区
+        Create rotation video, can output to file or memory buffer
         
         Args:
-            output_path: 输出视频文件路径，如果提供output_buffer则忽略
-            output_buffer: 输出内存缓冲区，优先于output_path
-            fps: 视频帧率
-            duration: 视频时长（秒）
-            resolution: 视频分辨率
+            output_path: Output video file path, ignored if output_buffer is provided
+            output_buffer: Output memory buffer, takes priority over output_path
+            fps: Video frame rate
+            duration: Video duration (seconds)
+            resolution: Video resolution
         """
         output_buffer = io.BytesIO()
-        # 计算总帧数
+        # Calculate total frames
         total_frames = fps * duration
         
-        # 保存当前相机参数
+        # Save current camera parameters
         original_camera = self.camera
         original_pitch, original_yaw, distance, center, fov = original_camera
-        # 使用内存缓冲区
-        # 设置视频编码器并创建视频writer
-        fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # 或其他编码器如'XVID'
+        # Use memory buffer
+        # Set up video encoder and create video writer
+        fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Or other encoders like 'XVID'
         
-        # 使用临时文件，然后读取其内容到缓冲区
+        # Use temporary file, then read its content to buffer
         with tempfile.NamedTemporaryFile(suffix='.mp4', delete=True) as temp_file:
             writer = cv2.VideoWriter(
                 temp_file.name, 
@@ -862,41 +862,41 @@ class TFparamsBase:
                 resolution
             )
             
-            # 生成旋转视频帧
+            # Generate rotation video frames
             for frame_idx in range(total_frames):
-                # 计算当前角度 (围绕对象旋转一圈)
+                # Calculate current angle (rotate around object once)
                 angle = frame_idx / total_frames * 2 * np.pi
                 
-                # 更新相机角度
+                # Update camera angle
                 self.camera = (original_pitch, original_yaw + angle, distance, center, fov)
                 
-                # 渲染当前帧
+                # Render current frame
                 img = self.render_image(setImage=False, addRedBorder=False,force_render=True)
                 # img.save(f'./rotate_img/img{frame_idx}.png')
-                # 将PIL Image转换为OpenCV格式
+                # Convert PIL Image to OpenCV format
                 img = np.array(img)
-                img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)  # PIL是RGB，OpenCV是BGR
+                img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)  # PIL is RGB, OpenCV is BGR
                 
-                # 写入帧
+                # Write frame
                 writer.write(img)
                 
-            # 释放资源
+            # Release resources
             writer.release()
             
-            # 重置文件指针并读取内容到缓冲区
+            # Reset file pointer and read content to buffer
             temp_file.seek(0)
             output_buffer.write(temp_file.read())
             output_buffer.seek(0)
     
-        # 恢复原始相机参数
+        # Restore original camera parameters
         self.camera = original_camera
         return output_buffer
 
     def __gen_ctf_from_gmm(self, color_mat, min_scalar_value, max_scalar_value):
-        """从高斯混合模型生成颜色传递函数"""
-        sort_color_mat = np.unique(color_mat, axis=0)  # 去重并排序
-        color_mat[0, 1:] = color_mat[1, 1:]  # 保证第一个颜色点和第二个颜色点相同
-        color_mat[-1, 1:] = color_mat[-2, 1:]  # 保证最后一个颜色点和倒数第二个颜色点相同
+        """Generate color transfer function from Gaussian mixture model"""
+        sort_color_mat = np.unique(color_mat, axis=0)  # Remove duplicates and sort
+        color_mat[0, 1:] = color_mat[1, 1:]  # Ensure first and second color points are the same
+        color_mat[-1, 1:] = color_mat[-2, 1:]  # Ensure last and second-to-last color points are the same
         cur_color_ind = 0
         color_map = np.zeros((self.tf_size, 4))
         
@@ -922,7 +922,7 @@ class TFparamsBase:
         return color_map
     
     def __gen_otf_from_gmm(self, opacity_gmm, min_scalar_value, max_scalar_value):
-        """从高斯混合模型生成不透明度传递函数"""
+        """Generate opacity transfer function from Gaussian mixture model"""
         opacity_map = np.zeros((self.tf_size, 2))
         for idx in range(self.tf_size):
             interp = float(idx)/(self.tf_size-1)
@@ -936,6 +936,6 @@ class TFparamsBase:
         return opacity_map
     
     def __update_x(self, opacity, color):
-        """更新颜色点的x坐标以匹配不透明度点"""
-        # 这里需要根据具体需求实现
+        """Update x-coordinates of color points to match opacity points"""
+        # Implementation needed based on specific requirements
         return opacity, color

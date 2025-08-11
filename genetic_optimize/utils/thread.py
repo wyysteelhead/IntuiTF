@@ -12,27 +12,27 @@ class ParallelExecutor:
                 post_process: Optional[Callable] = None,
                 desc: str = None) -> List[Any]:
         """
-        通用并行执行函数。
+        Generic parallel execution function.
 
-        :param tasks: 任务列表，每个元素传入 `task_fn` 处理
-        :param task_fn: 任务执行函数，每个任务会并行执行该函数
-        :param post_process: (可选) 后处理函数，接收 `future.result()` 作为参数
-        :param desc: 进度条描述
-        :return: 任务执行结果的列表
+        :param tasks: List of tasks, each element is passed to `task_fn` for processing
+        :param task_fn: Task execution function, each task will execute this function in parallel
+        :param post_process: (Optional) Post-processing function, receives `future.result()` as parameter
+        :param desc: Progress bar description
+        :return: List of task execution results
         """
         results = []
         futures = []
 
         with ThreadPoolExecutor(max_workers=self.num_workers) as executor:
-            # 提交任务
+            # Submit tasks
             futures = [executor.submit(task_fn, task) for task in tasks]
 
-            # 进度条
+            # Progress bar
             if desc:
                 progress_bar = tqdm(total=len(futures), desc=desc,
                                     bar_format="{l_bar}{bar} | {n_fmt}/{total_fmt}")
 
-            # 处理结果
+            # Process results
             for future in as_completed(futures):
                 result = future.result()
                 if post_process:
@@ -52,7 +52,7 @@ class ParallelExecutor:
         return results
     
 if __name__ == "__main__":
-    # 使用案例
+    # Usage example
     def process_task(self, task):
         i, j = task
         print(f"{i}, {j}")
@@ -66,7 +66,7 @@ if __name__ == "__main__":
     tasks = [(i, i + 1) for i in enumerate(10)]
     results = executor.execute(
         tasks=tasks, 
-        task_fn=process_task,  # 直接传入待调用方法
-        post_process=post_task, #如果数据不需要处理就不需要给post_process
-        desc="xxx"
+        task_fn=process_task,  # Directly pass the method to be called
+        post_process=post_task, # No need to provide post_process if data doesn't need processing
+        desc="Processing tasks"
     )

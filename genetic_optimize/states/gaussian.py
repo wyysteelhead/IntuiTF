@@ -38,7 +38,7 @@ class Gaussian:
     
     @staticmethod
     def setup_gaussians(opacity, color):
-        #兼容原本代码
+        # Compatible with original code
         if len(color[1:-1]) == len(opacity):
             color = color[1:-1]
             

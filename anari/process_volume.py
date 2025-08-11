@@ -3,7 +3,7 @@ import re
 import numpy as np
 
 def get_numpy_dtype(data_type_str):
-    """将字符串数据类型转换为numpy数据类型"""
+    """Convert string data type to numpy data type"""
     dtype_mapping = {
         'uint8': np.uint8,
         'uint16': np.uint16,
@@ -21,11 +21,11 @@ def get_numpy_dtype(data_type_str):
     return dtype_mapping.get(data_type_str.lower(), np.float32)
 
 def extract_dimensions(filename):
-    """从文件名提取维度和数据类型信息"""
+    """Extract dimension and data type information from filename"""
     patterns = [
         r"(\d+)x(\d+)x(\d+)_(\w+)",      # 256x256x124_uint8
-        r"(\d+)x(\d+)x(\d+)_(\w+)\.raw", # 完整格式
-        r"(\d+)x(\d+)x(\d+)",            # 只有维度
+        r"(\d+)x(\d+)x(\d+)_(\w+)\.raw", # Complete format
+        r"(\d+)x(\d+)x(\d+)",            # Dimensions only
     ]
     
     for pattern in patterns:
@@ -41,16 +41,16 @@ def extract_dimensions(filename):
 def load_and_process_volume(filepath, dims=None, dtype=None, threshold_ratio=0.1, 
                            normalize_range=(0.2, 1.0)):
     """
-    加载并预处理RAW体积数据，只返回data, dims, spacing
+    Load and preprocess RAW volume data, returns only data, dims, spacing
     """
     if not os.path.exists(filepath):
-        raise FileNotFoundError(f"文件不存在: {filepath}")
+        raise FileNotFoundError(f"File not found: {filepath}")
     
     filename = os.path.basename(filepath)
     file_size = os.path.getsize(filepath)
     spacing = (1, 1, 1)
     
-    # 尝试从文件名提取信息
+    # Try to extract information from filename
     if dims is None or dtype is None:
         extracted = extract_dimensions(filename)
         if extracted:
@@ -61,7 +61,7 @@ def load_and_process_volume(filepath, dims=None, dtype=None, threshold_ratio=0.1
                 dtype = get_numpy_dtype(data_type_str)
     
     if dims is None:
-        raise ValueError("必须提供维度信息（通过文件名或手动指定）")
+        raise ValueError("Dimension information must be provided (via filename or manual specification)")
     if dtype is None:
         dtype = np.float32
     
@@ -122,7 +122,7 @@ def load_and_process_volume(filepath, dims=None, dtype=None, threshold_ratio=0.1
     
     return reshaped_data, dims, spacing
 
-# # 预定义的已知体积配置
+# # Predefined known volume configurations
 # DEFAULT_KNOWN_VOLUMES = {
 #     "pancreas_240x512x512_int16.raw": {
 #         "dims": (240, 512, 512),
@@ -148,13 +148,13 @@ def load_and_process_volume(filepath, dims=None, dtype=None, threshold_ratio=0.1
 
 # def load_volume_simple(filepath, **kwargs):
 #     """
-#     简化的体积加载函数，使用默认配置
+#     Simplified volume loading function using default configuration
     
 #     Args:
-#         filepath: RAW文件路径
-#         **kwargs: 传递给load_and_process_volume的其他参数
+#         filepath: RAW file path
+#         **kwargs: Other parameters passed to load_and_process_volume
     
 #     Returns:
-#         dict: 处理结果
+#         dict: Processing results
 #     """
 #     return load_and_process_volume(filepath, known_volumes=DEFAULT_KNOWN_VOLUMES, **kwargs)

@@ -41,7 +41,7 @@ class LLM_Evaluator:
     @staticmethod
     def get_all_image_paths(folder_path):
         """
-        从指定文件夹中读取所有图片的路径。
+        Read all image paths from the specified folder.
         """
         supported_extensions = {".jpg", ".jpeg", ".png", ".bmp", ".gif"}
         return [
@@ -53,14 +53,14 @@ class LLM_Evaluator:
     @staticmethod
     def process_image_with_gpt4o(client, base64_image, prompt):
         """
-        将内存中的图片传递给模型，并返回输出。
+        Pass the image in memory to the model and return the output.
         """
         # base64_image = base64.b64encode(img_base64.read()).decode('utf-8')
         try:
-            #提交信息至GPT4o
+            # Submit information to GPT4o
             response = client.chat.completions.create(
-                model="gpt-4o",#选择模型
-                # model="deepseek-ai/Janus-Pro-7B",#选择模型
+                model="gpt-4o",  # Select model
+                # model="deepseek-ai/Janus-Pro-7B",  # Select model
                 messages=[
                     {
                         "role": "system",
@@ -121,7 +121,7 @@ class LLM_Evaluator:
     
     @staticmethod 
     def process_cmp_output(gpt_output, img_id1=1, img_id2=2):
-        import re  # 新增正则模块 
+        import re  # Add regex module 
         
         if "final answer:" not in gpt_output.lower():
             return -2 
@@ -129,12 +129,12 @@ class LLM_Evaluator:
         final_answer_line = gpt_output.lower().split("final answer:")[1].strip()
         scores = final_answer_line.split() 
         
-        # 强化过滤：正则匹配纯数字 
+        # Enhanced filtering: regex match for pure numbers 
         scores = [s for s in scores if re.match(r'^\d+$',  s)]
         if not scores:
             return -2 
         
-        # 精准捕获转换异常 
+        # Precisely capture conversion exceptions 
         try:
             scores = list(map(int, scores))
         except (ValueError, TypeError):
@@ -142,7 +142,7 @@ class LLM_Evaluator:
             print("gpt_output: ", gpt_output)
             return -2 
         
-        # 计数逻辑放在try外部 
+        # Count logic placed outside try block 
         count_1 = scores.count(1) 
         count_2 = scores.count(2) 
         
@@ -155,38 +155,38 @@ class LLM_Evaluator:
         
     @staticmethod 
     def process_gaussian_output(gpt_output):
-        import re  # 正则模块
+        import re  # Regex module
         
         if "final answer:" not in gpt_output.lower():
             return -2 
         
         final_answer_line = gpt_output.lower().split("final answer:")[1].strip()
         
-        # 使用正则表达式提取单个数字0或1
+        # Use regex to extract single digit 0 or 1
         match = re.search(r'\b([01])\b', final_answer_line)
         if not match:
             print("No valid answer (0 or 1) found in line:", final_answer_line)
             return -2
         
-        # 返回匹配到的单个数字
+        # Return the matched single digit
         return int(match.group(1))
         
     def reset_text(self, text):
         """
-        重置文本提示
+        Reset text prompt
         """
         # self.original_instruct = self.instruct
         self.instruct = text
         
     def reset_modification(self, text):
         """
-        设置微调提示
+        Set fine-tuning prompt
         """
         self.modification = text
         
     def reset_format(self, type):
         """
-        重置格式化提示
+        Reset format prompt
         """
         assert type == "quality" or type == "text" or type == "finetune" or type == "image"
         if type == "finetune":
@@ -206,7 +206,7 @@ class LLM_Evaluator:
         assert mode == "quality" or mode == "text" or mode == "finetune" or mode == "gaussian" or mode == "image"
         
         if mode == "gaussian":
-            #TODO 和真实的prompt对齐
+            # TODO: Align with actual prompt
             new_prompt = prompt
             new_prompt = new_prompt.replace("{DESCRIPTION}", self.instruct)
             return new_prompt
@@ -237,7 +237,7 @@ class LLM_Evaluator:
         
         if mode == "finetune":
             if self.instruct is None:
-                # 删除 一句话
+                # Remove one sentence
                 new_prompt = new_prompt.replace("Following is the text prompt from which the original volume rendered image is described:", "")
                 new_prompt = new_prompt.replace("{ORIGINAL_DESCRIPTION}", "")
             else:
@@ -248,13 +248,13 @@ class LLM_Evaluator:
     
     @staticmethod
     def image_to_base64_nparray(img):
-        # 转换 PIL Image 为 numpy 数组
+        # Convert PIL Image to numpy array
         img_array = np.array(img)
 
-        # 将 numpy 数组转换为 JPEG 格式的字节流
+        # Convert numpy array to JPEG format byte stream
         _, buffer = cv2.imencode('.jpg', img_array)
 
-        # 直接转换为 Base64
+        # Convert directly to Base64
         base64_str = base64.b64encode(buffer).decode('utf-8')
         return base64_str
     
@@ -299,31 +299,31 @@ class LLM_Evaluator:
         
     def evaluate_visibility(self, img, log_path=None):
         """
-        评估图像的可见度，根据指定指令让大模型返回可见度级别。
+        Evaluate image visibility, having the LLM return visibility level based on specified instructions.
         
         Args:
-            img: 要评估的图像对象(PIL Image)
-            instruction: 提供给大模型的指令，如果为None则使用默认的指令
-            log_path: 日志保存路径
+            img: Image object to evaluate (PIL Image)
+            instruction: Instructions provided to the LLM, uses default if None
+            log_path: Log save path
             
         Returns:
-            tuple: (可见度状态, 完整输出字典)
-                可见度状态为 "not recognizable", "recognizable" 或 "clear"
+            tuple: (visibility status, complete output dictionary)
+                visibility status is "not recognizable", "recognizable" or "clear"
         """
         if not img:
             print("Error: Input image is None or empty in", log_path)
             return "not recognizable", {"error": "Empty image"}
         
-        # 确保日志路径存在
+        # Ensure log path exists
         if log_path:
             os.makedirs(os.path.dirname(log_path), exist_ok=True)
         
-        # 将图像转换为base64
+        # Convert image to base64
         img_base64 = self.image_to_base64_nparray(img)
         
         instruction = self.instruct
         
-        # 构造提示 - 增加自然引导，避免直接进入instruction
+        # Construct prompt - add natural guidance, avoid jumping directly into instruction
         visibility_prompt = f"""
         You are an expert in analyzing volume rendered medical images. 
         Please evaluate the following image according to this instruction:
@@ -343,25 +343,25 @@ class LLM_Evaluator:
         """
         
         try:
-            # 调用API获取评估结果
+            # Call API to get evaluation results
             gpt_output = self.api.generate_text(prompt=visibility_prompt, imgbase64=img_base64)
             
-            # 解析输出，提取可见度评估结果
+            # Parse output, extract visibility evaluation results
             visibility = self.process_visibility_output(gpt_output)
             
-            # # 保存日志
+            # # Save logs
             # if log_path:
-            #     # 保存提示和响应
+            #     # Save prompt and response
             #     with open(os.path.join(log_path, "visibility_prompt.txt"), "w", encoding="utf-8") as f:
             #         f.write(visibility_prompt)
                     
             #     with open(os.path.join(log_path, "visibility_response.txt"), "w", encoding="utf-8") as f:
             #         f.write(gpt_output)
                     
-            #     # 保存图像
+            #     # Save image
             #     img.save(os.path.join(log_path, "evaluated_image.png"))
                 
-            #     # 保存结构化结果
+            #     # Save structured result
             #     with open(os.path.join(log_path, "visibility_result.json"), "w", encoding="utf-8") as f:
             #         json.dump({
             #             "visibility": visibility,
@@ -371,29 +371,29 @@ class LLM_Evaluator:
             return visibility, {"response": gpt_output, "visibility": visibility}
             
         except Exception as e:
-            print(f"评估可见度时出错: {str(e)}")
+            print(f"Error occurred while evaluating visibility: {str(e)}")
             import traceback
             traceback.print_exc()
             return "recognizable", {"error": str(e), "response": ""}
     def process_visibility_output(self, output):
         """
-        从大模型输出中解析可见度评估结果
+        Parse visibility evaluation results from LLM output
         
         Args:
-            output: 大模型的完整输出文本
+            output: Complete output text from the LLM
             
         Returns:
-            str: "not recognizable", "recognizable" 或 "clear"
+            str: "not recognizable", "recognizable" or "clear"
         """
-        # 将输出转为小写以便匹配
+        # Convert output to lowercase for matching
         output_lower = output.lower()
         
-        # 尝试找到"最终评估："后面的内容
-        if "最终评估：" in output_lower or "最终评估:" in output_lower:
-            # 提取最终评估部分
-            final_part = output_lower.split("最终评估：")[-1].split("最终评估:")[-1].strip()
+        # Try to find content after "Final Assessment:"
+        if "final assessment:" in output_lower:
+            # Extract final assessment part
+            final_part = output_lower.split("final assessment:")[-1].strip()
             
-            # 匹配可能的结果
+            # Match possible results
             if "not recognizable" in final_part:
                 return "not recognizable"
             elif "clear" in final_part:
@@ -401,7 +401,7 @@ class LLM_Evaluator:
             elif "recognizable" in final_part:
                 return "recognizable"
         
-        # 如果没有找到格式化的最终评估，尝试在整个文本中匹配
+        # If no formatted final assessment is found, try matching in the entire text
         if "not recognizable" in output_lower:
             return "not recognizable"
         elif "clear" in output_lower and "not clear" not in output_lower:
@@ -409,8 +409,8 @@ class LLM_Evaluator:
         elif "recognizable" in output_lower:
             return "recognizable"
         
-        # 默认返回"recognizable"作为最安全的选择
-        print("无法从输出中解析可见度评估，使用默认值'not recognizable'")
+        # Default return "not recognizable" as the safest choice
+        print("Unable to parse visibility evaluation from output, using default value 'not recognizable'")
         return "not recognizable"
     
     def compare_2_image(self, img1, img2, volume_name, mode, log_path = "", mute = True, return_output = True):
@@ -434,22 +434,22 @@ class LLM_Evaluator:
             output = {"img1": 0, "img2": 0, "result1": result1, "result2": result2, "gpt_output1": gpt_output1, "gpt_output2": gpt_output2}
         else:
             output = None
-        #结果相同
+        # Results are the same
         if result1 == result2:
             return state[result1], output
-        #结果不同，并且都是非error和draw，说明两者选择相反，当作draw
+        # Results are different, and both are non-error and non-draw, meaning opposite choices, treat as draw
         if result1 > 0 and result2 > 0:
             return "draw", output
-        #选择不同，并且一方是error/draw，取另一方的选择
+        # Different choices, and one side is error/draw, take the other side's choice
         if result1 > 0 and result2 < 0:
             return state[result1], output
-        #选择不同，并且一方是error/draw，取另一方的选择
+        # Different choices, and one side is error/draw, take the other side's choice
         if result1 < 0 and result2 > 0:
             return state[result2], output
-        #选择不同，并且有一方是draw，当作draw
+        # Different choices, and one side is draw, treat as draw
         if result1 == -1 or result2 == -1:
             return "draw", output
-        #选择不同，并且都是error
+        # Different choices, and both are error
         if log_path != "" and mute == False:
             LLM_Evaluator.log(log_path, img1_base64, img2_base64, gpt_output1, gpt_output2)
         return "error", output
@@ -460,7 +460,7 @@ class LLM_Evaluator:
         with open(os.path.join(log_path, f"prompt_mutate.txt"), "w", encoding="utf-8") as prompt_file:
             prompt_file.write(prompt
         )
-        # 拼接两张图片
+        # Concatenate two images
         img_base64 = image_to_base64_pil(img)
         action, directions, gpt_output = self.llm_evaluate_1_mutate_image(img_base64=img_base64, prompt=prompt)
         if return_output == True:
@@ -478,11 +478,11 @@ class LLM_Evaluator:
             log_file.write(f"GPT output1: {gpt_output1}\n")
             log_file.write(f"GPT output2: {gpt_output2}\n")
         image_data1 = base64.b64decode(img1_base64)
-        # 将图片保存到文件
+        # Save image to file
         with open(os.path.join(log_path, "img1.png"), "wb") as file:
             file.write(image_data1)
         image_data2 = base64.b64decode(img2_base64)
-        # 将图片保存到文件
+        # Save image to file
         with open(os.path.join(log_path, "img2.png"), "wb") as file:
             file.write(image_data2)
         print(f"GPT output written to {log_path}\n")

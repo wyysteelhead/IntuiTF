@@ -9,14 +9,14 @@ class OpenAIAPI(LLMAPI):
         self.base_url = base_url
         
         if test_connection:
-            # 一个1x1像素的最小测试图片的base64编码
+            # Base64 encoding of a minimal 1x1 pixel test image
             test_img_base64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVQI12P4//8/AAX+Av7czFnnAAAAAElFTkSuQmCC"
             test_prompt = "This is a connection test."
             
             result = self.generate_text(test_prompt, test_img_base64)
             
             if result == "":
-                raise ConnectionError(f"API连接测试失败。请检查您的API密钥、基础URL和网络连接。Model: {model}")
+                raise ConnectionError(f"API connection test failed. Please check your API key, base URL, and network connection. Model: {model}")
     
     def generate_text(self, prompt, imgbase64):
         client = OpenAI(
@@ -24,10 +24,10 @@ class OpenAIAPI(LLMAPI):
             base_url=self.base_url
         )
         try:
-            #提交信息至GPT4o
+            # Submit information to GPT4o
             response = client.chat.completions.create(
-                model=self.model,#选择模型
-                # model="deepseek-ai/Janus-Pro-7B",#选择模型
+                model=self.model,  # Select model
+                # model="deepseek-ai/Janus-Pro-7B",  # Select model
                 messages=[
                     {
                         "role": "system",

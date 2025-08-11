@@ -7,21 +7,21 @@ from genetic_optimize.TFparamsBase import TFparamsBase
 class Player:
     def __init__(self, player_id):
         self.id = player_id
-        self.rating = 1000  # 初始ELO积分
-        self.matches = set()  # 记录对战过的对手ID
+        self.rating = 1000  # Initial ELO rating
+        self.matches = set()  # Record opponent IDs that have been battled
 
     def __repr__(self):
         return f"Player {self.id} (ELO: {self.rating:.1f}, Skill: {self.true_skill:.1f})"
 
 def elo_update(winner: TFparamsBase, loser: TFparamsBase, k=32):
-    # ELO积分计算公式
+    # ELO rating calculation formula
     expected = 1 / (1 + 10 ** ((loser.rating - winner.rating) / 400))
     delta = k * (1 - expected)
     winner.rating += delta
     loser.rating -= delta
 
 def swiss_pairing(players: List[TFparamsBase]):
-    # 按积分降序排列
+    # Sort by rating in descending order
     sorted_players = sorted(players, key=lambda x: -x.rating)
     paired = set()
     pairs = []
@@ -29,14 +29,14 @@ def swiss_pairing(players: List[TFparamsBase]):
     for i in range(len(sorted_players)):
         if i in paired: continue
         
-        # 寻找最近未交战的对手
+        # Find the nearest opponent that hasn't been battled
         for j in range(i+1, len(sorted_players)):
             if j in paired: continue
             if sorted_players[j].id not in sorted_players[i].matches:
                 pairs.append((sorted_players[i], sorted_players[j]))
                 paired.update([i, j])
                 break
-        else:  # 没有可用对手时随机匹配
+        else:  # Random matching when no available opponent
             for j in range(i+1, len(sorted_players)):
                 if j not in paired:
                     pairs.append((sorted_players[i], sorted_players[j]))
@@ -45,47 +45,47 @@ def swiss_pairing(players: List[TFparamsBase]):
     return pairs
 
 def simulate_match(p1, p2):
-    # 根据真实实力决定胜负（实际场景中不可见）
+    # Determine winner based on true skill (invisible in actual scenarios)
     if p1.true_skill > p2.true_skill:
         winner, loser = p1, p2
     elif p1.true_skill < p2.true_skill:
         winner, loser = p2, p1
-    else:  # 平局处理
+    else:  # Handle draw
         winner, loser = random.choice([(p1, p2), (p2, p1)])
     
-    # 更新ELO积分
+    # Update ELO rating
     elo_update(winner, loser)
     
-    # 记录对战历史
+    # Record battle history
     p1.matches.add(p2.id)
     p2.matches.add(p1.id)
 
 def tournament(n=8):
-    # 初始化选手
+    # Initialize players
     players = [Player(i) for i in range(n)]
     
-    # 计算所需轮次（log2(n) + 2轮）
+    # Calculate required rounds (log2(n) + 2 rounds)
     rounds = int(math.log2(n)) + 2
     
-    # 初始随机配对
+    # Initial random pairing
     random.shuffle(players)
     for i in range(0, n, 2):
         p1, p2 = players[i], players[i+1]
         simulate_match(p1, p2)
 
-    # 瑞士轮阶段
+    # Swiss round stage
     for _ in range(rounds-1):
         pairs = swiss_pairing(players)
         for p1, p2 in pairs:
             simulate_match(p1, p2)
 
-    # 最终排名
+    # Final ranking
     final_ranking = sorted(players, key=lambda x: (-x.rating, -x.true_skill))
     return final_ranking
 
-# 运行示例
+# Run example
 if __name__ == "__main__":
     final = tournament(8)
-    print("最终排名（ELO积分 + 真实实力）：")
+    print("Final ranking (ELO rating + true skill):")
     for i, p in enumerate(final, 1):
         print(f"{i:2}. {p}")

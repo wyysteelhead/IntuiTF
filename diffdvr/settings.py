@@ -83,8 +83,8 @@ class Settings:
         if not os.path.isabs(path):
             path = os.path.abspath(os.path.join(self._filepath, path))
             print("convert relative path to absolute path, load", path)
-        # 修改文件名，添加 "grad"
-        base, ext = os.path.splitext(path)  # 拆分路径和扩展名
+        # Modify filename to add "grad" suffix
+        base, ext = os.path.splitext(path)  # Split path and extension
         if ext == ".cvol":
             path = f"{base}grad{ext}"
         if os.path.exists(path):

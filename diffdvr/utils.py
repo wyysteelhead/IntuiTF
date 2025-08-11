@@ -103,7 +103,7 @@ def random_point_on_sphere(N: int, *, dtype=np.float32) -> Tuple[np.ndarray, np.
     :param dtype: the desired dtype for the output (default: np.float32)
     :return: a tuple (pitch/latitude, yaw/longitude) in radians
     """
-    # 随机生成 N 个纬度（lat）和经度（lon）
+    # Randomly generate N latitudes (lat) and longitudes (lon)
     # latitudes (pitch) between -π/2 and π/2
     lat = np.arcsin(2 * np.random.rand(N, dtype=dtype) - 1)
     

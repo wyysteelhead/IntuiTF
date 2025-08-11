@@ -15,29 +15,29 @@ from anari.renderer import render_volume
 
 class TFparamsAnariImp(TFparamsBase):
     """
-    使用 Anari (pynari) 渲染器实现的传递函数参数类
+    Transfer function parameters class implemented using Anari (pynari) renderer
     """
     
-    global_inputs = None  # 类变量，存储全局渲染设置
+    global_inputs = None  # Class variable, stores global render settings
     
     def __init__(self, id: int, bound: Bound=None, volume: np.array = None, gradient: np.array = None, step_size = None, initial_rating=1600, W=512, H=512, bg_color=None, device="cuda", renderer_dtype_np = np.float64, tfparams=None, setInputs=False):
         super().__init__(id, bound, initial_rating, W, H, bg_color, device, renderer_dtype_np, tfparams)
         
-        # 初始化渲染器设置
+        # Initialize renderer settings
         if setInputs and bound is not None:
             self.__initialize_render_inputs(volume, gradient, step_size)
         elif setInputs and tfparams is not None:
             self.__initialize_settings(setInputs=setInputs)
             
     def __spherical_to_cartesian(self, pitch, yaw, distance, center=(0,0,0)):
-        """球坐标转笛卡尔坐标"""
+        """Convert spherical coordinates to Cartesian coordinates"""
         x = distance * math.cos(pitch) * math.sin(yaw)
         y = distance * math.sin(pitch)
         z = distance * math.cos(pitch) * math.cos(yaw)
         return (center[0] + x, center[1] + y, center[2] + z)
             
     def __initialize_render_inputs(self, volume, gradient, step_size):
-        """初始化渲染器的输入参数"""
+        """Initialize renderer input parameters"""
         if volume is None:
             raise ValueError("必须提供体积数据")
             
