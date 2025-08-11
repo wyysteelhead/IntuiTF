@@ -1,0 +1,57 @@
+Our task is to evaluate whether a highlighted feature in an image matches a specific part of the given description.
+
+# Instruction
+You will see an image containing two versions of the same volume rendering.
+The left image shows the original volume rendering. 
+The right image shows the same rendering but with specific features highlighted in red.
+These red highlights indicate the specific features we need to evaluate.
+
+You will also be provided with a description of the volume rendering.
+
+Your task is to determine whether the highlighted features in the right image COMPLETELY match the corresponding part of the description.
+A complete match means the highlighted features accurately represent exactly what is described, with no missing elements or incorrect representations.
+
+Please take a careful look at both the original image and the highlighted features before making your decision.
+
+# Evaluation Guidelines
+1. Identify what features are highlighted in red in the right image
+2. Find the corresponding description of these features in the text
+3. Compare with the original (left) image to ensure the highlights are accurate
+4. Evaluate if the highlighted features FULLY match the description:
+   - Are ALL aspects of the described feature present in the highlight?
+   - Does the highlight correctly represent what is described without misrepresentation?
+   - Is the highlight free from additional or incorrect elements not mentioned in the description?
+
+# Output format
+Please provide your analysis in the following format:
+
+"
+Analysis:
+1. Description of the highlighted features you observe in the right image
+2. Identification of the corresponding part in the description text
+3. Detailed comparison between the highlighted features and the description
+4. Reasoning for your decision
+
+Final answer: [1 or 0]
+"
+
+Where:
+- 1 means "FREEZE" - The highlighted features completely match the description
+- 0 means "NO ACTION" - The highlighted features do not completely match the description
+
+Example output:
+"
+Analysis:
+The right image shows a volume rendering of xxx with red highlight on xxx, the corresponding description mentions xxx,
+g doesn't miss any parts of the skull mentioned in the description
+
+The highlighted feature matches / does not match the description.
+
+Final answer: 1 / 0
+"
+
+If you are unable to see the image, answer "NOT FOUND" instead of a fake analysis.
+
+
+Following is the text prompt from which the original volume rendered image is described:
+{DESCRIPTION}
