@@ -531,18 +531,18 @@ class TFparamsBase:
                             if directions is not None and directions.color.hues is not None:
                                 hues = directions.color.hues
                             else:
-                                # 感知敏感的色相变异改进（保持0-1范围）
+                                # Perceptually sensitive hue mutation improvement (maintain 0-1 range)
                                 hue_span = color_bound.hues[1] - color_bound.hues[0]
-                                red_zone = 0.05  # 红色敏感区边界（对应0-0.05和0.95-1.0）
-                                # 动态步长调整（红色区域步长缩减60%）
+                                red_zone = 0.05  # Red sensitive zone boundary (corresponding to 0-0.05 and 0.95-1.0)
+                                # Dynamic step size adjustment (red zone step size reduced by 60%)
                                 H_scale = np.where(((hues < red_zone) | (hues > 1-red_zone)), 
-                                                H_scale_factor * 0.4,  # 红色区
-                                                H_scale_factor) * hue_span  # 常规区
-                                # 环形空间平滑变异（通过极坐标避免突变）
-                                theta = hues * 2 * np.pi  # 映射到极角
-                                dh = np.random.normal(0, H_scale)  # 生成变异量
-                                hues = ((theta + dh) % (2*np.pi)) / (2*np.pi)  # 回环映射
-                                # 约束到目标区间
+                                                H_scale_factor * 0.4,  # Red zone
+                                                H_scale_factor) * hue_span  # Normal zone
+                                # Circular space smooth mutation (avoid sudden changes through polar coordinates)
+                                theta = hues * 2 * np.pi  # Map to polar angle
+                                dh = np.random.normal(0, H_scale)  # Generate mutation amount
+                                hues = ((theta + dh) % (2*np.pi)) / (2*np.pi)  # Circular mapping
+                                # Constrain to target range
                                 hues = hues * hue_span + color_bound.hues[0]
                                 hues = np.clip(hues, color_bound.hues[0], color_bound.hues[1])
                         # elif channel == 1:  # Saturation mutation
@@ -554,7 +554,7 @@ class TFparamsBase:
                                                         lightnesses,
                                                         directions.color.lightnesses if directions is not None and hasattr(directions.color, 'lightnesses') else None)
                         
-                        # 转换回RGB
+                        # Convert back to RGB
                         r, g, b = colorsys.hls_to_rgb(hues, lightnesses, saturations)
                         self.gaussians[i].color[0] = np.clip(r, 0, 1)
                         self.gaussians[i].color[1] = np.clip(g, 0, 1)
@@ -680,7 +680,7 @@ class TFparamsBase:
                 # turn rgb into red
                 gaussians[i].color = np.array([1, 0, 0])
             
-        # 只设置目标高斯的不透明度为原始值
+        # Only set target Gaussian opacity to original value
         gaussians[gaussian_index].opacity[2] = self.gaussians[gaussian_index].opacity[2]
         
         # Collect all Gaussian opacities
@@ -710,8 +710,8 @@ class TFparamsBase:
         
         back_image_gray = apply_semi_transparent_background(
             image=back_image_gray, 
-            opacity=0.1,  # 可以调整半透明程度
-            bg_color=self.bg_color  # 默认白色背景
+            opacity=0.1,  # Can adjust semi-transparency level
+            bg_color=self.bg_color  # Default white background
         )
         
         # deprecated Generate the outline image
@@ -768,8 +768,8 @@ class TFparamsBase:
         
         back_image_gray = apply_semi_transparent_background(
             image=back_image_gray, 
-            opacity=0.1,  # 可以调整半透明程度
-            bg_color=self.bg_color  # 默认白色背景
+            opacity=0.1,  # Can adjust semi-transparency level
+            bg_color=self.bg_color  # Default white background
         )
         # Generate the outline image
         # outline_img = self.render_image_with_outline(image)
