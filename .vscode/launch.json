@@ -1,0 +1,41 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Genetic",
+            "type": "python",
+            "request": "launch",
+            "program": "genetic.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+            "--base_url", "https://api.zjuvai.cn/v1",
+            "--api_key", "sk-a6bo4rYpgweVQ3wQA4D047Cf4eAa4f0b869391760bF53a00",
+            "--config_file", "./diffdvr/config-files/engine.json",
+            "--prompt_folder", "./prompt",
+            "--population_size", "4",
+            "--generations", "2",
+            "--save_interval", "1",
+            "--instruct_number", "engine2",
+            "--save_path", "/folderFromHost/results/0706/gemini2/engine2",
+            "--quality_metrics", "16,11,14",
+            "--text_metrics", "5",
+            "--intent_interval", "16",
+            "--bg_color", "'(255,255,255)'",
+            "--renderer", "anari",
+            "--model_name", "gemini-2.0-flash-001"
+            ]
+        },
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        }
+    ]
+}

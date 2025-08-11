@@ -34,7 +34,7 @@ class LLM_Evaluator:
             self.api = OpenAIAPI(base_url=base_url, api_key=api_key, model=model_name)
         elif "gemini" in model_name.lower():
             # self.api = GeminiAPI(base_url=base_url, api_key=api_key, model=model_name)
-            self.api = OpenAIAPI(base_url=base_url, api_key=api_key, model=model_name)
+            self.api = GeminiAPI(base_url=base_url, api_key=api_key, model=model_name)
         else:
             raise ValueError(f"Model not supported: {model_name}.")
         

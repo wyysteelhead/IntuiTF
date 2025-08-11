@@ -11,6 +11,7 @@ class GeminiAPI(LLMAPI):
     
     def generate_text(self, prompt, imgbase64):
         URL = f"{self.base_url}/v1beta/models/{self.model}:generateContent?key={self.api_key}"
+        print(">??????????????????", URL)
         payload = {
             "contents": [{
                 "parts": [

@@ -3,11 +3,28 @@ import sys
 import time
 import pickle
 import random
-import torch
 from tqdm import tqdm
-from diffdvr.settings import Settings
-from diffdvr import renderer_dtype_torch, renderer_dtype_np
-from genetic_optimize.eval.metric_eval import MetricEvaluator
+
+# 添加库路径
+sys.path.append('/usr/local/lib/')
+
+# 添加DLL搜索路径（Windows）
+dll_paths = [
+    r"C:\Program Files (x86)\anari-sdk\bin",
+    r"C:\Program Files (x86)\anari-sdk\lib",
+    r"C:\Program Files (x86)\pynari\lib", 
+    r"C:\Program Files (x86)\Barney\bin"
+]
+
+for path in dll_paths:
+    if os.path.exists(path):
+        try:
+            os.add_dll_directory(path)
+        except:
+            pass
+
+# Renderer-specific imports will be done dynamically based on renderer type
+from genetic_optimize.utils.dtype_utils import get_renderer_dtypes
 from genetic_optimize.eval.llm_eval import LLM_Evaluator
 from genetic_optimize.states.bound import Bound
 from genetic_optimize.states.genetic_config import GeneticConfig
@@ -22,14 +39,12 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import matplotlib.pyplot as plt
 import io
 from genetic_optimize.utils.thread import ParallelExecutor
-import pyrenderer
 import multiprocessing
-from genetic_optimize.TFparamsImp import TFparamsImp
 import math
 from typing import List
 import bisect
 from genetic_optimize.eval.elo_rating import elo_update, swiss_pairing
-from genetic_optimize.utils.image_utils import combine_image, concat_images, compute_ssim, fitness_sharing_with_matrix
+from genetic_optimize.utils.image_utils import combine_image, concat_images
 from PIL import Image, ImageDraw, ImageFont
 import numpy as np
 import ast
