@@ -601,7 +601,6 @@ class TFparamsBase:
         ctf = color_tf[:, 1:]
         otf = opacity_tf[:, 1:]
         tf = np.concatenate([ctf, otf], axis=1)
-        print("self.renderer_dtype_np", self.renderer_dtype_np)
         tf = torch.from_numpy(np.array([tf], dtype=self.renderer_dtype_np)).to(device=self.device)
         return tf
         
