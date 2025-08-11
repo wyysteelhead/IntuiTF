@@ -72,6 +72,7 @@ class TFparamsBase:
         self.id = tfparams.id
         self.rating = tfparams.rating
         self.matches = set(tfparams.matches)  # Create a new set with the same values
+        self.renderer_dtype_np = tfparams.renderer_dtype_np
     
     def to_json(self):
         """
@@ -600,6 +601,7 @@ class TFparamsBase:
         ctf = color_tf[:, 1:]
         otf = opacity_tf[:, 1:]
         tf = np.concatenate([ctf, otf], axis=1)
+        print("self.renderer_dtype_np", self.renderer_dtype_np)
         tf = torch.from_numpy(np.array([tf], dtype=self.renderer_dtype_np)).to(device=self.device)
         return tf
         
