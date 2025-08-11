@@ -11,7 +11,7 @@ class GeminiAPI(LLMAPI):
     
     def generate_text(self, prompt, imgbase64):
         URL = f"{self.base_url}/v1beta/models/{self.model}:generateContent?key={self.api_key}"
-        print(">??????????????????", URL)
+        print(">DEBUG: API URL:", URL)
         payload = {
             "contents": [{
                 "parts": [
@@ -26,9 +26,9 @@ class GeminiAPI(LLMAPI):
             }]
         }
 
-        # 发送请求
+        # Send request
         headers = {"Content-Type": "application/json"}
         response = requests.post(URL, headers=headers, data=json.dumps(payload))
         response = response.json()
-        # 输出结果
+        # Return result
         return response['candidates'][0]['content']['parts'][0]['text']

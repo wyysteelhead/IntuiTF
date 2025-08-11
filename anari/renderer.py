@@ -6,14 +6,14 @@ import matplotlib.pyplot as plt
 from PIL import Image
 from tqdm import tqdm
 
-# 尝试导入pynari
+# Try to import pynari
 try:
     import pynari
 except ImportError:
-    print("警告: 无法导入pynari，请确保已正确安装")
+    print("Warning: Unable to import pynari, please ensure it is properly installed")
 
 def spherical_to_cartesian(pitch, yaw, distance, center):
-    """球坐标转笛卡尔坐标"""
+    """Convert spherical coordinates to cartesian coordinates"""
     x = distance * math.cos(pitch) * math.sin(yaw)
     y = distance * math.sin(pitch)
     z = distance * math.cos(pitch) * math.cos(yaw)
@@ -22,37 +22,37 @@ def spherical_to_cartesian(pitch, yaw, distance, center):
 def setup_volume_renderer(volume_data, volume_dims, tf,
                          center_at_origin=True, device=None):
     """
-    设置体积渲染器
+    Setup volume renderer
     
     Args:
-        volume_data: 体积数据numpy数组，形状为(depth, height, width)
-        volume_dims: 原始体积维度 (width, height, depth)
-        tf: 传输函数numpy数组，None为自动选择
-        center_at_origin: 是否将体积中心置于原点
-        device: ANARI设备，None为创建新设备
+        volume_data: Volume data numpy array, shape (depth, height, width)
+        volume_dims: Original volume dimensions (width, height, depth)
+        tf: Transfer function numpy array, None for automatic selection
+        center_at_origin: Whether to center the volume at the origin
+        device: ANARI device, None to create new device
     
     Returns:
         dict: {
-            'device': ANARI设备,
-            'world': 世界对象,
-            'volume': 体积对象,
-            'spatial_field': 空间场对象,
-            'volume_info': 体积信息字典
+            'device': ANARI device,
+            'world': World object,
+            'volume': Volume object,
+            'spatial_field': Spatial field object,
+            'volume_info': Volume information dictionary
         }
     """
     if pynari is None:
-        raise ImportError("pynari未安装，无法使用渲染功能")
+        raise ImportError("pynari not installed, cannot use rendering functionality")
     
-    # 创建设备
+    # Create device
     if device is None:
         device = pynari.newDevice('default')
     
-    # 计算单元格大小和原点
+    # Calculate cell size and origin
     max_dim = max(volume_dims)
     cellSize = (2/max_dim, 2/max_dim, 2/max_dim)
     
     if center_at_origin:
-        # 居中设置
+        # Center setting
         actual_x = volume_dims[0] * cellSize[0]
         actual_y = volume_dims[1] * cellSize[1]
         actual_z = volume_dims[2] * cellSize[2]
@@ -60,7 +60,7 @@ def setup_volume_renderer(volume_data, volume_dims, tf,
     else:
         origin = (-1, -1, -1)
     
-    # 创建ANARI对象
+    # Create ANARI objects
     structured_data = device.newArray(pynari.float, volume_data)
     spatial_field = device.newSpatialField('structuredRegular')
     spatial_field.setParameter('origin', pynari.float3, origin)
@@ -79,7 +79,7 @@ def setup_volume_renderer(volume_data, volume_dims, tf,
     volume_array = device.newArray(pynari.VOLUME, [volume])
     world.setParameter('volume', pynari.ARRAY3D, volume_array)
 
-    # 设置光照
+    # Setup lighting
     light = device.newLight('directional')
     light.setParameter('direction', pynari.float3, (1., -1., -1.))
     light.commitParameters()
@@ -104,18 +104,18 @@ def setup_volume_renderer(volume_data, volume_dims, tf,
 
 def setup_camera(device, W, H, look_from, look_at, look_up, fovy=40.0):
     """
-    设置相机
+    Setup camera
     
     Args:
-        device: ANARI设备
-        fb_size: 帧缓冲区尺寸 (width, height)
-        look_from: 相机位置 (x, y, z)
-        look_at: 观察目标 (x, y, z)
-        look_up: 上方向 (x, y, z)
-        fovy: 视野角度（度）
+        device: ANARI device
+        fb_size: Frame buffer size (width, height)
+        look_from: Camera position (x, y, z)
+        look_at: Look at target (x, y, z)
+        look_up: Up direction (x, y, z)
+        fovy: Field of view angle (degrees)
     
     Returns:
-        camera: 相机对象
+        camera: Camera object
     """
     fb_size = (W, H)
     camera = device.newCamera('perspective')
@@ -134,16 +134,16 @@ def setup_camera(device, W, H, look_from, look_at, look_up, fovy=40.0):
 
 def setup_renderer(device, camera, world, fb_size, bg_color, pixel_samples=None):
     """
-    设置渲染器
+    Setup renderer
     
     Args:
-        device: ANARI设备
-        fb_size: 帧缓冲区尺寸 (width, height)
-        bg_color: 背景颜色，输入为字符串"(r,g,b)"格式
-        pixel_samples: 像素采样数，None为自动选择
+        device: ANARI device
+        fb_size: Frame buffer size (width, height)
+        bg_color: Background color, input as string "(r,g,b)" format
+        pixel_samples: Pixel sample count, None for automatic selection
     
     Returns:
-        dict: {'renderer': 渲染器, 'frame': 帧对象}
+        dict: {'renderer': Renderer, 'frame': Frame object}
     """
     bg_color = bg_color.strip("() ").split(',')
     bg_color = np.array(bg_color, dtype=np.float32)
@@ -179,17 +179,17 @@ def render_volume(volume_input, volume_dims, W, H,
                  camera_config, tf, bg_color, pixel_samples=None, render_setup=None):
     fb_size = (W, H)
     volume_data = volume_input.copy()
-    # 确保传输函数格式正确
-    if tf.ndim == 2 and tf.shape[1] == 4:  # 如果是(N,4)格式
-        # 将其展平为一维数组
+    # Ensure transfer function format is correct
+    if tf.ndim == 2 and tf.shape[1] == 4:  # If (N,4) format
+        # Flatten to 1D array
         tf = tf.reshape(-1)
     
-    # 设置体积渲染器
+    # Setup volume renderer
     
-    # 创建设备
+    # Create device
     device = pynari.newDevice('default')
     
-    # 计算单元格大小和原点
+    # Calculate cell size and origin
     max_dim = max(volume_dims)
     cellSize = (2/max_dim, 2/max_dim, 2/max_dim)
     
@@ -198,7 +198,7 @@ def render_volume(volume_input, volume_dims, W, H,
     actual_z = volume_dims[2] * cellSize[2]
     origin = (-actual_x/2, -actual_y/2, -actual_z/2)
     
-    # 创建ANARI对象
+    # Create ANARI objects
     structured_data = device.newArray(pynari.float, volume_data)
     spatial_field = device.newSpatialField('structuredRegular')
     spatial_field.setParameter('origin', pynari.float3, origin)
@@ -217,7 +217,7 @@ def render_volume(volume_input, volume_dims, W, H,
     volume_array = device.newArray(pynari.VOLUME, [volume])
     world.setParameter('volume', pynari.ARRAY3D, volume_array)
 
-    # 设置光照
+    # Setup lighting
     light = device.newLight('directional')
     light.setParameter('direction', pynari.float3, (1., -1., -1.))
     light.commitParameters()
@@ -225,7 +225,7 @@ def render_volume(volume_input, volume_dims, W, H,
     world.setParameter('light', pynari.ARRAY1D, light_array)
     world.commitParameters()
     
-    # 设置相机
+    # Setup camera
     center = (0, 0, 0)
     look_from = spherical_to_cartesian(
         camera_config['pitch'], 
@@ -248,7 +248,7 @@ def render_volume(volume_input, volume_dims, W, H,
     camera.setParameter('fovy', pynari.float, fovy * math.pi / 180)
     camera.commitParameters()
     
-    # 设置渲染器
+    # Setup renderer
     # if render_setup is None:
     
     bg_color = bg_color.strip("() ").split(',')
@@ -279,7 +279,7 @@ def render_volume(volume_input, volume_dims, W, H,
     frame.setParameter('world', pynari.OBJECT, world)
     frame.commitParameters()
     
-    # 渲染
+    # Render
     frame.render()
     fb_color = frame.get('channel.color')
     pixels = np.array(fb_color)
@@ -288,7 +288,7 @@ def render_volume(volume_input, volume_dims, W, H,
     im = im.transpose(Image.FLIP_TOP_BOTTOM)
     im = im.convert('RGB')
 
-    # 释放资源
+    # Release resources
     spatial_field.release()
     structured_data.release()
     volume.release()
@@ -308,34 +308,34 @@ def render_volume(volume_input, volume_dims, W, H,
 # def render_volume(volume_data, volume_dims, W, H,
 #                  camera_config, tf, bg_color, pixel_samples=None, render_setup=None):
 #     """
-#     渲染体积数据的简单接口
+#     Simple interface for rendering volume data
     
 #     Args:
-#         volume_data: 体积数据numpy数组
-#         volume_dims: 体积维度 (width, height, depth)
-#         output_path: 输出文件路径，None为显示图像
-#         W,H: 帧的长宽
-#         camera_config: 相机配置字典 {'pitch': 弧度, 'yaw': 弧度, 'distance': 距离}
-#         tf: 传输函数
-#         bg_color: 背景颜色，输入为字符串"(r,g,b)"格式
-#         pixel_samples: 像素采样数
+#         volume_data: Volume data numpy array
+#         volume_dims: Volume dimensions (width, height, depth)
+#         output_path: Output file path, None to display image
+#         W,H: Frame width and height
+#         camera_config: Camera configuration dict {'pitch': radians, 'yaw': radians, 'distance': distance}
+#         tf: Transfer function
+#         bg_color: Background color, input as string "(r,g,b)" format
+#         pixel_samples: Pixel sample count
     
 #     Returns:
-#         numpy数组: 渲染后的像素数据
+#         numpy array: Rendered pixel data
 #     """
 #     fb_size = (W, H)
     
-#     # 确保传输函数格式正确
-#     if tf.ndim == 2 and tf.shape[1] == 4:  # 如果是(N,4)格式
-#         # 将其展平为一维数组
+#     # Ensure transfer function format is correct
+#     if tf.ndim == 2 and tf.shape[1] == 4:  # If (N,4) format
+#         # Flatten to 1D array
 #         tf = tf.reshape(-1)
     
-#     # 设置体积渲染器
+#     # Setup volume renderer
 #     volume_setup = setup_volume_renderer(volume_data, volume_dims, tf)
 #     device = volume_setup['device']
 #     world = volume_setup['world']
     
-#     # 设置相机
+#     # Setup camera
 #     center = volume_setup['volume_info']['center']
 #     look_from = spherical_to_cartesian(
 #         camera_config['pitch'], 
@@ -352,13 +352,13 @@ def render_volume(volume_input, volume_dims, W, H,
 #         look_up=(0., 1., 0.)
 #     )
     
-#     # 设置渲染器
+#     # Setup renderer
 #     # if render_setup is None:
 #     render_setup = setup_renderer(device, camera, world, fb_size, bg_color, pixel_samples)
 #     renderer = render_setup['renderer']
 #     frame = render_setup['frame']
     
-#     # 渲染
+#     # Render
 #     frame.render()
 #     fb_color = frame.get('channel.color')
 #     pixels = np.array(fb_color)
@@ -374,34 +374,34 @@ def create_rotation_video(volume_data, volume_dims,output_path='rotation_video.m
                          fps=30, duration=8, W=1600, H=800,
                          radius=3.0, tf=None, pixel_samples=None, render_setup=None):
     """
-    创建体积数据的旋转视频
+    Create rotation video of volume data
     
     Args:
-        volume_data: 体积数据numpy数组
-        volume_dims: 体积维度 (width, height, depth)
-        fps: 帧率
-        duration: 视频时长（秒）
-        W,H: 帧的长宽
-        radius: 相机旋转半径
-        tf: 传输函数
-        pixel_samples: 像素采样数
+        volume_data: Volume data numpy array
+        volume_dims: Volume dimensions (width, height, depth)
+        fps: Frame rate
+        duration: Video duration (seconds)
+        W,H: Frame width and height
+        radius: Camera rotation radius
+        tf: Transfer function
+        pixel_samples: Pixel sample count
     
     Returns:
-        str: 输出视频路径
+        str: Output video path
     """
     fb_size = (W, H)
-    # 设置体积渲染器
+    # Setup volume renderer
     volume_setup = setup_volume_renderer(volume_data, volume_dims, tf)
     device = volume_setup['device']
     world = volume_setup['world']
     center = volume_setup['volume_info']['center']
     
     
-    # 设置初始相机
+    # Setup initial camera
     camera = setup_camera(device, W, H, (radius, 0.5, 0), center, (0., 1., 0.))
 
 
-    # 设置渲染器
+    # Setup renderer
     render_setup = setup_renderer(device, camera, world, fb_size, pixel_samples)
     renderer = render_setup['renderer']
     frame = render_setup['frame']
@@ -412,29 +412,29 @@ def create_rotation_video(volume_data, volume_dims,output_path='rotation_video.m
     frame.setParameter('channel.color', pynari.DATA_TYPE, pynari.UFIXED8_RGBA_SRGB)
     frame.commitParameters()
     
-    # 视频设置
+    # Video settings
     total_frames = fps * duration
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     video_writer = cv2.VideoWriter(output_path, fourcc, fps, fb_size)
     
-    print(f"开始生成旋转视频...")
-    print(f"  总帧数: {total_frames}")
-    print(f"  帧率: {fps} FPS")
-    print(f"  视频时长: {duration} 秒")
-    print(f"  输出文件: {output_path}")
+    print(f"Starting rotation video generation...")
+    print(f"  Total frames: {total_frames}")
+    print(f"  Frame rate: {fps} FPS")
+    print(f"  Video duration: {duration} seconds")
+    print(f"  Output file: {output_path}")
     
-    for frame_idx in tqdm(range(total_frames), desc="渲染帧"):
-        # 计算当前帧的旋转角度
+    for frame_idx in tqdm(range(total_frames), desc="Rendering frames"):
+        # Calculate rotation angle for current frame
         angle = (frame_idx / total_frames) * 2 * math.pi
         
-        # 计算相机位置（绕Y轴旋转）
+        # Calculate camera position (rotate around Y axis)
         camera_x = center[0] + radius * math.sin(angle)
         camera_z = center[2] + radius * math.cos(angle)
         camera_y = center[1] + 0.5
         
         look_from = (camera_x, camera_y, camera_z)
         
-        # 更新相机参数
+        # Update camera parameters
         camera.setParameter('position', pynari.FLOAT32_VEC3, look_from)
         direction = [center[0] - look_from[0],
                     center[1] - look_from[1],
@@ -442,38 +442,38 @@ def create_rotation_video(volume_data, volume_dims,output_path='rotation_video.m
         camera.setParameter('direction', pynari.float3, direction)
         camera.commitParameters()
         
-        # 渲染当前帧
+        # Render current frame
         frame.render()
         fb_color = frame.get('channel.color')
         pixels = np.array(fb_color)
         
-        # 转换为OpenCV格式（BGR）
+        # Convert to OpenCV format (BGR)
         pixels_bgr = cv2.cvtColor(pixels, cv2.COLOR_RGBA2BGR)
         pixels_bgr = cv2.flip(pixels_bgr, 0)
         
-        # 写入视频帧
+        # Write video frame
         video_writer.write(pixels_bgr)
     
     video_writer.release()
-    print(f"✓ 视频已保存到: {output_path}")
+    print(f"✓ Video saved to: {output_path}")
     return output_path
 
-# # 简化的接口函数
+# # Simplified interface function
 # def render_raw_file(filepath, output_path=None, video=False, **kwargs):
 #     """
-#     直接从RAW文件渲染的便捷函数
-#     需要配合volume_loader使用
+#     Convenience function for rendering directly from RAW files
+#     Requires use with volume_loader
     
 #     Args:
-#         filepath: RAW文件路径
-#         output_path: 输出路径
-#         video: 是否生成视频
-#         **kwargs: 其他参数
+#         filepath: RAW file path
+#         output_path: Output path
+#         video: Whether to generate video
+#         **kwargs: Other parameters
 #     """
 #     try:
 #         from volume_loader import load_volume_simple
         
-#         # 加载体积数据
+#         # Load volume data
 #         result = load_volume_simple(filepath)
 #         volume_data = result['data']
 #         volume_dims = result['original_dims']
@@ -484,4 +484,4 @@ def create_rotation_video(volume_data, volume_dims,output_path='rotation_video.m
 #             return render_volume(volume_data, volume_dims, output_path, **kwargs)
             
 #     except ImportError:
-#         raise ImportError("需要volume_loader模块来加载RAW文件")
+#         raise ImportError("Requires volume_loader module to load RAW files")

@@ -1,6 +1,6 @@
 from types import SimpleNamespace
 import numpy as np
-# from tools.cameraGenerator import generateByFibonacciSphere #神秘咒语，删除会导致pyrenderer导入失败
+# from tools.cameraGenerator import generateByFibonacciSphere # Magic spell, removing this causes pyrenderer import failure
 # from module import Module
 import json
 
