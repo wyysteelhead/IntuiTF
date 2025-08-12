@@ -25,7 +25,7 @@ class TFparamsBase:
     H = 512
     max_opacity=1.0
     min_opacity=0.0
-    bg_color = (0,0,0)
+    bg_color = (255,255,255)
     renderer_dtype_np = np.float64
 
     def __init__(self, id: int, bound : Bound = None, initial_rating=1600, W = 512, H = 512, bg_color = None, device="cuda", renderer_dtype_np = np.float64, tfparams = None):
@@ -190,6 +190,13 @@ class TFparamsBase:
         fov = random.uniform(bound.camera_bound.fov[0], bound.camera_bound.fov[1])
         center = bound.center
         return pitch, yaw, distance, center, fov
+
+    def load_render_settings(self, bound, bg_color=(255,255,255), W=512, H=512):
+        TFparamsBase.max_opacity = max(TFparamsBase.max_opacity, bound.opacity_bound.y[1])
+        TFparamsBase.min_opacity = min(TFparamsBase.min_opacity, bound.opacity_bound.y[0])
+        TFparamsBase.W = W
+        TFparamsBase.H = H
+        TFparamsBase.bg_color = bg_color
     
     def __gen_opacity(self, bound : Bound, num=None):
         if num == None: 

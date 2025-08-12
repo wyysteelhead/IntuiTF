@@ -58,6 +58,14 @@ class TFparamsImp(TFparamsBase):
         """Override parent class abstract method"""
         copy_of_self = TFparamsImp(id=self.id, tfparams=self, setInputs=True)
         return copy_of_self
+
+    def load_render_settings(self, bound, volume, gradient, step_size, bg_color=(255,255,255), W=512, H=512):
+        super().load_render_settings(bound=bound, bg_color=bg_color, W=W, H=H)
+        if self.global_inputs is None:
+            self.global_inputs = setup_default_settings(
+            volume, gradient, self.W, self.H,
+            step_size, True, True)
+        self.inputs = setup_settings_from_settings(settings=self.global_inputs)
     
     def get_camera_matrix(self, camera=None):
         """Get camera matrix"""
