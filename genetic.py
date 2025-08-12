@@ -5,10 +5,10 @@ import pickle
 import random
 from tqdm import tqdm
 
-# 添加库路径
+# Add library paths
 sys.path.append('/usr/local/lib/')
 
-# 添加DLL搜索路径（Windows）
+# Add DLL search paths (Windows)
 dll_paths = [
     r"C:\Program Files (x86)\anari-sdk\bin",
     r"C:\Program Files (x86)\anari-sdk\lib",
@@ -50,7 +50,7 @@ import numpy as np
 import ast
 from genetic_optimize.TFparamsBase import TFparamsBase
 			
-#是否生成高斯分布GIF
+# Whether to generate Gaussian distribution GIF
 Test=False
 
 class GeneticAlgorithm:
@@ -116,7 +116,7 @@ class GeneticAlgorithm:
         self.save_path = config_manager.get_algorithm_config().save_path
         self.config = self.bound.config
         self.tf_size = self.bound.opacity_bound.x[1]
-        self.renderer_type = renderer_type  # 存储渲染器类型
+        self.renderer_type = renderer_type  # Store renderer type
         
         algorithm_config = config_manager.get_algorithm_config()
         mutation_config = config_manager.get_mutation_config()
@@ -1132,9 +1132,9 @@ def parse_args(mode="train"):
     def parse_range(value_str):
         """Helper function to parse a single value or a range."""
         if ',' in value_str:
-            return tuple(map(float, value_str.split(',')))  # 解析成元组
+            return tuple(map(float, value_str.split(',')))  # Parse as tuple
         else:
-            return float(value_str)  # 单一数字
+            return float(value_str)  # Single number
     
     def parse_int_list(value_str):
         """Helper function to parse a string into either a list of integers or a single value."""
@@ -1143,10 +1143,10 @@ def parse_args(mode="train"):
         else:
             return int(value_str)
         
-    # 创建 ArgumentParser 对象
+    # Create ArgumentParser object
     parser = argparse.ArgumentParser(description="Run Genetic Algorithm with specified parameters.")
 
-    # 添加命令行参数
+    # Add command line arguments
     parser.add_argument('--config_file', type=str, required=True, help="Path to the bound config file.")
     parser.add_argument('--state_path', type=str, default=None, help="Previous state to be optimized on, default random.")
     parser.add_argument('--population_size', type=int, default=20, help="Size of the population.")
@@ -1175,12 +1175,12 @@ def parse_args(mode="train"):
     parser.add_argument('--model_name', type=str, default="gpt-4o", help="Model name for the API.")
     parser.add_argument('--new_save_path', action='store_true', help="Whether to create a new save path.")
     parser.add_argument('--style_image', type=str, default=None, help="The styling image path.")
-    parser.add_argument('--renderer', type=str, default="diffdvr", choices=["diffdvr", "anari"], help="Renderer to use (diffdvr or anari)")  # 添加渲染器选择参数
+    parser.add_argument('--renderer', type=str, default="diffdvr", choices=["diffdvr", "anari"], help="Renderer to use (diffdvr or anari)")  # Add renderer selection parameter
     if mode == "backend":
-        parser.add_argument('--port', type=int, default=6006, help='服务器起始端口号 (默认: 6006)')
-        parser.add_argument('--max_attempts', type=int, default=10, help='尝试查找可用端口的最大次数 (默认: 10)')
+        parser.add_argument('--port', type=int, default=6006, help='Server starting port number (default: 6006)')
+        parser.add_argument('--max_attempts', type=int, default=10, help='Maximum attempts to find available port (default: 10)')
     
-    # 解析命令行参数
+    # Parse command line arguments
     args = parser.parse_args()
     args.cam_mutation_rate = parse_range(args.cam_mutation_rate)
     args.cam_mutation_scale = parse_range(args.cam_mutation_scale)
@@ -1224,14 +1224,14 @@ if __name__ == "__main__":
         population, iteration, mode = None, 0, []
         
     print("current iteration: ", iteration)
-    print(f"Using renderer: {args.renderer}")  # 添加渲染器信息输出
+    print(f"Using renderer: {args.renderer}")  # Add renderer info output
     
     genetic_algorithm = GeneticAlgorithm(
         config_manager=config_manager,
         population=population,
         iteration=iteration,
         device=args.device,
-        renderer_type=args.renderer  # 传入渲染器类型
+        renderer_type=args.renderer  # Pass in renderer type
     )
     
     # Run genetic algorithm

@@ -39,9 +39,9 @@ class TFparamsAnariImp(TFparamsBase):
     def __initialize_render_inputs(self, volume, gradient, step_size):
         """Initialize renderer input parameters"""
         if volume is None:
-            raise ValueError("必须提供体积数据")
+            raise ValueError("Volume data must be provided")
             
-        # 如果全局设置不存在，创建新的设置
+        # If global settings don't exist, create new settings
         if TFparamsAnariImp.global_inputs is None:
             TFparamsAnariImp.global_inputs = setup_default_settings(
                 volume_data=volume,
@@ -49,42 +49,42 @@ class TFparamsAnariImp(TFparamsBase):
                 screen_height=self.H
             )
         
-        # 从全局设置创建实例设置
+        # Create instance settings from global settings
         self.inputs = setup_settings_from_settings(TFparamsAnariImp.global_inputs)
         
     def __initialize_settings(self, setInputs=True):
-        """从全局设置初始化实例设置"""
+        """Initialize instance settings from global settings"""
         if setInputs and TFparamsAnariImp.global_inputs is not None:
             self.inputs = setup_settings_from_settings(TFparamsAnariImp.global_inputs)
             
     def _get_copy(self):
-        """重写父类的抽象方法"""
+        """Override parent class abstract method"""
         copy_of_self = TFparamsAnariImp(id=self.id, tfparams=self, setInputs=True)
         return copy_of_self
         
     def render_image(self, device="cuda", bg_color=None, force_render=False, 
                     setImage=True, addRedBorder=False, tf=None, transparent=False):
-        """渲染单个视角的图像"""
+        """Render image from single viewpoint"""
         if not hasattr(self, 'inputs') or not hasattr(self.inputs, 'device'):
-            raise RuntimeError("渲染器未初始化，请先调用__initialize_render_inputs")
+            raise RuntimeError("Renderer not initialized, please call __initialize_render_inputs first")
         
         if self.image is not None and not force_render:
             return self.image
 
-        # 设置相机配置
+        # Set camera configuration
         camera_config = {
-            'pitch': 3.5,  # 约90度仰角
-            'yaw': 2.2,    # 0度偏航角
+            'pitch': 3.5,  # Approximately 90 degree elevation
+            'yaw': 2.2,    # 0 degree yaw angle
             'distance': 10.0
         }
 
-        # 如果没有提供传输函数，使用当前的传输函数
+        # If no transfer function is provided, use current transfer function
         if tf is None:
-            tf = self.get_tf().cpu().numpy()[0]  # 移除batch维度
+            tf = self.get_tf().cpu().numpy()[0]  # Remove batch dimension
         if bg_color is None:
             bg_color = self.bg_color
 
-        # 使用renderer.py中的render_volume函数
+        # Use render_volume function from renderer.py
         im = render_volume(
             volume_input=self.inputs.volume_data,
             volume_dims=self.inputs.volume_dims,
@@ -105,43 +105,43 @@ class TFparamsAnariImp(TFparamsBase):
         return im
     
     def render_image_on_sphere(self, num_views=300, device="cuda", bg_color=None):
-        """在球面上渲染多个视角的图像"""
+        """Render multiple viewpoint images on sphere"""
         if not hasattr(self, 'inputs') or not hasattr(self.inputs, 'device'):
-            raise RuntimeError("渲染器未初始化，请先调用__initialize_render_inputs")
+            raise RuntimeError("Renderer not initialized, please call __initialize_render_inputs first")
             
         images = []
-        radius = 3.4  # 相机距离
+        radius = 3.4  # Camera distance
         
-        # 生成球面上的均匀分布点
-        phi = np.pi * (3 - np.sqrt(5))  # 黄金角
+        # Generate uniformly distributed points on sphere
+        phi = np.pi * (3 - np.sqrt(5))  # Golden angle
         for i in range(num_views):
-            y = 1 - (i / float(num_views - 1)) * 2  # y从1到-1
-            radius_at_y = np.sqrt(1 - y * y)  # 当前y位置的圆半径
+            y = 1 - (i / float(num_views - 1)) * 2  # y from 1 to -1
+            radius_at_y = np.sqrt(1 - y * y)  # Circle radius at current y position
             
-            theta = phi * i  # 方位角
+            theta = phi * i  # Azimuth angle
             
             x = np.cos(theta) * radius_at_y
             z = np.sin(theta) * radius_at_y
             
-            # 计算球面坐标
+            # Calculate spherical coordinates
             pitch = np.arcsin(y)
             yaw = np.arctan2(x, z)
             
-            # 设置当前视角的相机配置
+            # Set camera configuration for current viewpoint
             camera_config = {
                 'pitch': pitch,
                 'yaw': yaw,
                 'distance': radius
             }
 
-            # 使用renderer.py中的render_volume函数
+            # Use render_volume function from renderer.py
             im = render_volume(
                 volume_data=self.inputs.volume_data,
                 volume_dims=self.inputs.volume_dims,
                 W=self.W,
                 H=self.H,
                 camera_config=camera_config,
-                tf=self.get_tf().cpu().numpy()[0],  # 使用当前的传输函数
+                tf=self.get_tf().cpu().numpy()[0],  # Use current transfer function
                 pixel_samples=1024 if pynari.has_cuda_capable_gpu() else 16
             )
             
