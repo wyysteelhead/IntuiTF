@@ -19,7 +19,7 @@
 *** https://www.markdownguide.org/basic-syntax/#reference-style-links
 -->
 
-  <h1 align="center">What You Think Is What You Get: Bridge User Intent and Transfer Function Design through Multimodal Large Language Models</h3>
+  <h1 align="center">IntuiTF: MLLM-Guided Transfer Function Optimization for Direct Volume Rendering</h3>
 
   <p align="center">
   📄 <a href="https://arxiv.org/abs/2506.18407">arXiv</a> • 🌐 <a href="https://zjuvai.cn/TFEvolve/">Project Page</a>
@@ -56,7 +56,7 @@
 
 
   <p align="center">
-  We present WYTWYG (What You Think Is What You Get), a novel framework that bridges the semantic gap between user intent and transfer function design in Direct Volume Rendering. Our system allows users to intuitively specify visualization goals through multimodal interactions through two core innovations: (1) an evolution-based TF space explorer that effectively navigates the vast parameter space, and (2) a generalized quality evaluator powered by Multi-modal Large Language Models (MLLMs) that provides intelligent visual guidance. Through these components, users can intuitively express their visualization goals while the system automatically optimizes TFs to match their intent. Our framework demonstrates superior generalizability across various volumetric datasets and significantly improves the efficiency of TF design compared to traditional approaches.
+  We present IntuiTF, a novel framework that bridges the semantic gap between user intent and transfer function design in Direct Volume Rendering. Our system allows users to intuitively specify visualization goals through multimodal interactions through two core innovations: (1) an evolution-based TF space explorer that effectively navigates the vast parameter space, and (2) a generalized quality evaluator powered by Multi-modal Large Language Models (MLLMs) that provides intelligent visual guidance. Through these components, users can intuitively express their visualization goals while the system automatically optimizes TFs to match their intent. Our framework demonstrates superior generalizability across various volumetric datasets and significantly improves the efficiency of TF design compared to traditional approaches.
   </p>
 </div>
 
@@ -64,7 +64,7 @@
 
 ## About The Project
 
-WYTWYG (What You Think Is What You Get) is an intelligent transfer function (TF) design framework that bridges the semantic gap between user visual intent and transfer function design in Direct Volume Rendering. By leveraging Multi-modal Large Language Models (MLLMs), our system makes volumetric data visualization more intuitive and efficient.
+IntuiTF is an intelligent transfer function (TF) design framework that bridges the semantic gap between user visual intent and transfer function design in Direct Volume Rendering. By leveraging Multi-modal Large Language Models (MLLMs), our system makes volumetric data visualization more intuitive and efficient.
 
 Here's what makes WYTWYG special:
 * 🎯 **Intent-Driven Design:** Bridges the semantic gap between user visual intent and transfer function parameters through intelligent automation.
