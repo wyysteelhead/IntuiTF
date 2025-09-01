@@ -66,14 +66,14 @@
 
 IntuiTF is an intelligent transfer function (TF) design framework that bridges the semantic gap between user visual intent and transfer function design in Direct Volume Rendering. By leveraging Multi-modal Large Language Models (MLLMs), our system makes volumetric data visualization more intuitive and efficient.
 
-Here's what makes WYTWYG special:
+Here's what makes IntuiTF special:
 * 🎯 **Intent-Driven Design:** Bridges the semantic gap between user visual intent and transfer function parameters through intelligent automation.
 * 🧬 **Evolution-Based Explorer:** Employs genetic algorithms with efficient TF encoding for effective exploration of the vast parameter space.
 * 🤖 **MLLM-Powered Evaluator:** Uses Multi-modal Large Language Models to provide human-aligned visual quality assessment and intent matching.
 * 🔄 **Three-Stage Optimization:** Formalizes expert TF design process into Trial, Insight, and Replanning stages for systematic optimization.
 * 🌐 **Superior Generalizability:** Demonstrates effectiveness across various volumetric datasets and visualization scenarios.
 
-Compared to existing approaches, WYTWYG offers:
+Compared to existing approaches, IntuiTF offers:
 - Reduced semantic gap between user intent and TF design
 - Automated optimization guided by human-aligned evaluation
 - Enhanced generalizability across diverse datasets
