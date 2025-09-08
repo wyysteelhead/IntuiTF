@@ -56,7 +56,7 @@
 
 
   <p align="center">
-  We present IntuiTF, a novel framework that bridges the semantic gap between user intent and transfer function design in Direct Volume Rendering. Our system allows users to intuitively specify visualization goals through multimodal interactions through two core innovations: (1) an evolution-based TF space explorer that effectively navigates the vast parameter space, and (2) a generalized quality evaluator powered by Multi-modal Large Language Models (MLLMs) that provides intelligent visual guidance. Through these components, users can intuitively express their visualization goals while the system automatically optimizes TFs to match their intent. Our framework demonstrates superior generalizability across various volumetric datasets and significantly improves the efficiency of TF design compared to traditional approaches.
+  We present IntuiTF, a novel framework that bridges the semantic gap between user intent and transfer function design in Direct Volume Rendering. Our system allows users to intuitively design transfer function by specify visualization goals through multimodal interactions, built upon two key innovations: (1) an evolution-based TF space explorer that effectively navigates the vast parameter space, and (2) a MLLM-guided human-aligned evaluator that provides intelligent visual guidance. Through these components, users can intuitively express their visualization goals while the system automatically optimizes TFs to match their intent. Our framework demonstrates superior generalizability across various volumetric datasets. Please checkout more cases in [our supplementary materials](./images/additional_cases.pdf).
   </p>
 </div>
 
@@ -67,17 +67,17 @@
 IntuiTF is an intelligent transfer function (TF) design framework that bridges the semantic gap between user visual intent and transfer function design in Direct Volume Rendering. By leveraging Multi-modal Large Language Models (MLLMs), our system makes volumetric data visualization more intuitive and efficient.
 
 Here's what makes IntuiTF special:
-* 🎯 **Intent-Driven Design:** Bridges the semantic gap between user visual intent and transfer function parameters through intelligent automation.
-* 🧬 **Evolution-Based Explorer:** Employs genetic algorithms with efficient TF encoding for effective exploration of the vast parameter space.
-* 🤖 **MLLM-Powered Evaluator:** Uses Multi-modal Large Language Models to provide human-aligned visual quality assessment and intent matching.
-* 🔄 **Three-Stage Optimization:** Formalizes expert TF design process into Trial, Insight, and Replanning stages for systematic optimization.
-* 🌐 **Superior Generalizability:** Demonstrates effectiveness across various volumetric datasets and visualization scenarios.
+* 🧬 **Evolution-Driven Explorer:** Employs genetic algorithms with efficient TF encoding to systematically generate, mutate, and select diverse transfer function candidates across the vast parameter space.
+* 🤖 **Human-Aligned Evaluator:** Leverages Multi-modal Large Language Models to provide visual quality assessment that aligns with human judgment and user intent, replacing static heuristics with intelligent evaluation.
+* 🎯 **Intent-Driven Optimization:** Bridges the semantic gap between high-level user visualization goals and low-level transfer function parameters through multimodal interaction and automated optimization.
+* 🌐 **Generalized Framework:** Demonstrates effectiveness across diverse volumetric datasets and visualization scenarios without requiring domain-specific priors or volume-specific training.
+
 
 Compared to existing approaches, IntuiTF offers:
+- Exploration of unknown volumes from the start
 - Reduced semantic gap between user intent and TF design
 - Automated optimization guided by human-aligned evaluation
 - Enhanced generalizability across diverse datasets
-- Improved efficiency in achieving desired visualization results
 
 We welcome suggestions and contributions! Feel free to fork the repo, create a pull request, or open an issue.
 
@@ -296,11 +296,11 @@ If you use TFEvolve in your research, please cite our work:
 
 ```bibtex
 @misc{wang2025whatyouthink,
-  title        = {What You Think Is What You Get: Bridge User Intent and Transfer Function Design through Multimodal Large Language Models},
+  title        = {IntuiTF: MLLM-Guided Transfer Function Optimization for Direct Volume Rendering},
   author       = {Wang, Yiyao and Pan, Bo and Wang, Ke and Liu, Han and Mao, Jinyuan and Liu, Yuxin and Zhu, Minfeng and Zhang, Bo and Chen, Weifeng and Huang, Xiuqi and Chen, Wei},
   year         = {2025},
   publisher    = {arXiv},
-  howpublished = {\url{https://github.com/wyysteelhead/TFevolve}}
+  howpublished = {\url{https://github.com/wyysteelhead/IntuiTF}}
 }
 ```
 
