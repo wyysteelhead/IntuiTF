@@ -295,12 +295,13 @@ Project Link: [https://github.com/wyysteelhead/TFevolve](https://github.com/wyys
 If you use TFEvolve in your research, please cite our work:
 
 ```bibtex
-@misc{wang2025whatyouthink,
+@misc{wang2025intuiTF,
   title        = {IntuiTF: MLLM-Guided Transfer Function Optimization for Direct Volume Rendering},
   author       = {Wang, Yiyao and Pan, Bo and Wang, Ke and Liu, Han and Mao, Jinyuan and Liu, Yuxin and Zhu, Minfeng and Zhang, Bo and Chen, Weifeng and Huang, Xiuqi and Chen, Wei},
   year         = {2025},
   publisher    = {arXiv},
-  howpublished = {\url{https://github.com/wyysteelhead/IntuiTF}}
+  howpublished = {\url{https://github.com/wyysteelhead/IntuiTF}},
+  doi = {https://doi.org/10.48550/arXiv.2506.18407}
 }
 ```
 
