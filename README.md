@@ -301,7 +301,7 @@ If you use TFEvolve in your research, please cite our work:
   year         = {2025},
   publisher    = {arXiv},
   howpublished = {\url{https://github.com/wyysteelhead/IntuiTF}},
-  doi = {https://doi.org/10.48550/arXiv.2506.18407}
+  doi = {10.48550/arXiv.2506.18407}
 }
 ```
 
