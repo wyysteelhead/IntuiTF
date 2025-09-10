@@ -56,7 +56,7 @@
 
 
   <p align="center">
-  We present IntuiTF, a novel framework that bridges the semantic gap between user intent and transfer function design in Direct Volume Rendering. Our system allows users to intuitively design transfer function by specify visualization goals through multimodal interactions, built upon two key innovations: (1) an evolution-based TF space explorer that effectively navigates the vast parameter space, and (2) a MLLM-guided human-aligned evaluator that provides intelligent visual guidance. Through these components, users can intuitively express their visualization goals while the system automatically optimizes TFs to match their intent. Our framework demonstrates superior generalizability across various volumetric datasets. Please checkout more cases in [our supplementary materials](./images/additional_cases.pdf).
+  We present IntuiTF, a novel framework that bridges the semantic gap between user intent and transfer function design in Direct Volume Rendering. Our system allows users to intuitively design transfer function by specify visualization goals through multimodal interactions, built upon two key innovations: (1) an evolution-based TF space explorer that effectively navigates the vast parameter space, and (2) a MLLM-guided human-aligned evaluator that provides intelligent visual guidance. Through these components, users can intuitively express their visualization goals while the system automatically optimizes TFs to match their intent. Our framework demonstrates superior generalizability across various volumetric datasets. Please checkout more cases in <a href="./images/additional_cases.pdf">our supplementary materials</a>.
   </p>
 </div>
 
